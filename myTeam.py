@@ -337,7 +337,8 @@ class DefensiveReflexAgent(ReflexCaptureAgent):
 
         currentState = successor.getAgentState(self.index)
         currentPos = currentState.getPosition()
-        self.guardPosition = random.choice(self.getGuardBorders(gameState))
+        guardBorders = self.getGuardBorders(gameState)
+        self.guardPosition = self.getGuardBorders(gameState)[len(guardBorders) - 3]
         features['onDefense'] = 1
         if currentState.isPacman:
             features['onDefense'] = 0
