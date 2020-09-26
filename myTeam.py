@@ -319,7 +319,6 @@ class OffensiveReflexAgent(ReflexCaptureAgent):
         return min(ghostDistArr)
 
 
-# Standard defensive agent implemented from baseline team, own defensive not implemented yet.
 class DefensiveReflexAgent(ReflexCaptureAgent):
     # Last food position that the agent can protect
     lastProtectedFood = (0, 0)
