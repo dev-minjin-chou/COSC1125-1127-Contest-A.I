@@ -123,6 +123,7 @@ class ReflexCaptureAgent(CaptureAgent):
         """
         return {'successorScore': 1.0}
 
+
 # Uses expectimax adversial searh for now, will improve offensive agent. #
 class OffensiveReflexAgent(ReflexCaptureAgent):
     """
@@ -130,6 +131,7 @@ class OffensiveReflexAgent(ReflexCaptureAgent):
     we give you to get an idea of what an offensive agent might look like,
     but it is by no means the best or only way to build an offensive agent.
     """
+
     def actions(self, gameState):
         legalMoves = gameState.getLegalActions(0)
         scores = []
@@ -184,7 +186,7 @@ class OffensiveReflexAgent(ReflexCaptureAgent):
         currFood = gameState.getFood().asList()
         foodD = []
         ghostD = []
-        currGPosition= gameState.getGhostPositions()
+        currGPosition = gameState.getGhostPositions()
 
         rtrnVal = 0
         if gameState.isWin():
@@ -220,7 +222,7 @@ class OffensiveReflexAgent(ReflexCaptureAgent):
         ncLeft += numCLeft * 9999999
 
         # Better evaluation function hence take into account the additional factors. #
-        return gameState.getScore() + (1/minFoodDistance + rtrnVal) * (1/rfVal * 1/ncLeft)
+        return gameState.getScore() + (1 / minFoodDistance + rtrnVal) * (1 / rfVal * 1 / ncLeft)
 
     def getFeatures(self, gameState, action):
         features = util.Counter()
@@ -233,12 +235,13 @@ class OffensiveReflexAgent(ReflexCaptureAgent):
         walls = gameState.getWalls()
         currentState = successor.getAgentState(self.index)
         currentPos = currentState.getPosition()
-        opponents = [successor.getAgentState(i) for i in self.getOpponents(successor)]
-        ghostPos = [x for x in opponents if not x.isPacman and x.getPosition() != None]
-        opponentPacman = [y for y in opponents if y.isPacman and y.getPosition() != None]
+        opponents = [successor.getAgentState(oppo) for oppo in self.getOpponents(successor)]
+        # Ghost positions = [ (0,3), ... ]
+        ghostPos = [x for x in opponents if not x.isPacman and x.getPosition() is not None]
+        opponentPacmen = [y for y in opponents if y.isPacman and y.getPosition() is not None]
         numFoods = len(foodList)
         distG = len(ghostPos)
-        distOP = len(opponentPacman)
+        distOP = len(opponentPacmen)
         numCaps = len(cLeft)
 
         # blueFood = gameState.getBlueFood().asList()
@@ -253,7 +256,7 @@ class OffensiveReflexAgent(ReflexCaptureAgent):
         # If food is nearby #
         if numFoods > 0:
             minDistance = min([self.getMazeDistance(currentPos, food) for food in foodList])
-            features['distanceToFood'] = float(minDistance) /(walls.width * walls.height)
+            features['distanceToFood'] = float(minDistance) / (walls.width * walls.height)
             features['foodLeft'] = numFoods
 
         # If caps is nearby #
@@ -264,27 +267,29 @@ class OffensiveReflexAgent(ReflexCaptureAgent):
             features['distanceToCaps'] = minDistance
 
         # If opponent pacman is in our map
-        if distOP > 0:
-            minDistance = min([self.getMazeDistance(currentPos, i.getPosition()) for i in opponentPacman])
-            features['distanceToOP'] = minDistance + 1
-
-        # If ghost is nearby #
+        # if distOP > 0:
+        #     minDistance = min([self.getMazeDistance(currentPos, i.getPosition()) for i in opponentPacmen])
+        #     features['distanceToOP'] = minDistance + 1
+        #
+        # # If ghost is nearby #
         # if distG > 0:
         #     evaluateG = 0.0
         #     dist = 0.0
         #     ghostR = [ghost for ghost in ghostPos if ghost.scaredTimer == 0]
-        #     ghostScared = [ghost for ghost in opponents if ghost.scaredTimer > 0]
+        #     ghostScared = [ghost for ghost in ghostPos if ghost.scaredTimer > 0]
         #     distGR = len(ghostR)
         #     distGS = len(ghostScared)
         #
         #     if distGR > 0:
-        #         evaluateG = min([self.getMazeDistance(currentPos, ghost.getPosition()) for ghost in ghostR])
-        #         if evaluateG <= 1: evaluateG = -float('inf')
+        #         evaluateG = self.computeMinDistance(currentPos, ghostR)
+        #         if evaluateG <= 1:
+        #             evaluateG = -float('inf')
         #
         #     if distGS > 0:
-        #         dist = min([self.getMazeDistance(currentPos, ghost.getPosition()) for ghost in ghostScared])
+        #         dist = self.computeMinDistance(currentPos, ghostScared)
         #     if dist < evaluateG or evaluateG == 0:
-        #         if dist == 0: features['scaredG'] = -10
+        #         if dist == 0:
+        #             features['scaredG'] = -10
         #     features['distanceToG'] = evaluateG
 
         if len(ghostPos) > 0:
@@ -311,7 +316,15 @@ class OffensiveReflexAgent(ReflexCaptureAgent):
 
     def getWeights(self, gameState, action):
         return {'successorScore': 100, 'distanceToFood': -2, 'foodLeft': -2, 'distanceToCaps': -1, 'distanceToOP': -70,
-                'ghostScared': -1,  'distanceToGhost': 3, 'stop': -100, 'reverse': -2}
+                'ghostScared': -1, 'distanceToGhost': 3, 'stop': -100, 'reverse': -2}
+
+    def computeMinDistance(self, currentPos, ghosts):
+        # A temp array used for finding minimum distance between current position and the ghost
+        ghostDistArr = []
+        for ghost in ghosts:
+            ghostDistArr.append(self.getMazeDistance(currentPos, ghost.getPosition()))
+        return min(ghostDistArr)
+
 
 # Standard defensive agent implemented from baseline team, own defensive not implemented yet.
 class DefensiveReflexAgent(ReflexCaptureAgent):
