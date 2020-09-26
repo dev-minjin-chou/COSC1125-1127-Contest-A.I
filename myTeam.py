@@ -321,6 +321,10 @@ class OffensiveReflexAgent(ReflexCaptureAgent):
 
 # Standard defensive agent implemented from baseline team, own defensive not implemented yet.
 class DefensiveReflexAgent(ReflexCaptureAgent):
+    # Last food position that the agent can protect
+    lastProtectedFood = (0, 0)
+    foods = []
+    guardPosition = (0, 0)
     """
     A reflex agent that keeps its side Pacman-free. Again,
     this is to give you an idea of what a defensive agent
@@ -332,26 +336,88 @@ class DefensiveReflexAgent(ReflexCaptureAgent):
         features = util.Counter()
         successor = self.getSuccessor(gameState, action)
 
-        myState = successor.getAgentState(self.index)
-        myPos = myState.getPosition()
-
-        # Computes whether we're on defense (1) or offense (0)
+        currentState = successor.getAgentState(self.index)
+        currentPos = currentState.getPosition()
+        self.guardPosition = random.choice(self.getGuardBorders(gameState))
         features['onDefense'] = 1
-        if myState.isPacman: features['onDefense'] = 0
+        if currentState.isPacman:
+            features['onDefense'] = 0
 
+        features['Boundries'] = self.getMazeDistance(currentPos, self.guardPosition)
+
+        self.foods = self.getFoodYouAreDefending(gameState).asList()
         # Computes distance to invaders we can see
         enemies = [successor.getAgentState(i) for i in self.getOpponents(successor)]
-        invaders = [a for a in enemies if a.isPacman and a.getPosition() != None]
+        invaders = [a for a in enemies if a.isPacman and a.getPosition() is not None]
+
         features['numInvaders'] = len(invaders)
         if len(invaders) > 0:
-            dists = [self.getMazeDistance(myPos, a.getPosition()) for a in invaders]
-            features['invaderDistance'] = min(dists)
+            dists = []
+            pos = []
+            for invader in invaders:
+                dists.append(self.getMazeDistance(currentPos, invader.getPosition()))
+                pos.append(invader.getPosition())
 
-        if action == Directions.STOP: features['stop'] = 1
+            closestPos = pos[0]
+            closestDist = dists[0]
+
+            for i in range(len(dists)):
+                if dists[i] >= closestDist:
+                    continue
+                closestPos = pos[i]
+                closestDist = dists[i]
+
+            features['invaderPDistance'] = closestDist
+            if (features['invaderDistance'] == 1 or features['invaderPDistance'] == 1 or features[
+                'invaderLDistance'] == 1):
+                self.flag = 0
+                self.lastProtectedFood = closestPos
+                features['invaderLDistance'] = self.getMazeDistance(currentPos, self.lastProtectedFood)
+                self.foods = self.getFoodYouAreDefending(gameState).asList()
+
+            foodLength = len(self.foods)
+            # A list of food position that the agent is defending i.e., [ (x,y) ]
+            defendingFoodList = self.getFoodYouAreDefending(gameState).asList()
+            if foodLength > len(defendingFoodList):
+                # Begin chasing opponents
+                for i in range(foodLength):
+                    if foodLength <= 0 or len(defendingFoodList) <= i:
+                        continue
+                    if self.foods[i][0] != defendingFoodList[i][0] or self.foods[i][1] != defendingFoodList[i][1]:
+                        features['invaderPDistance'] = self.getMazeDistance(currentPos, self.foods[i])
+                        self.lastProtectedFood = self.foods[i]
+                        self.foods = defendingFoodList
+                        break
+
+        if action == Directions.STOP:
+            features['stop'] = 1
         rev = Directions.REVERSE[gameState.getAgentState(self.index).configuration.direction]
-        if action == rev: features['reverse'] = 1
+        if action == rev:
+            features['reverse'] = 1
 
         return features
 
     def getWeights(self, gameState, action):
-        return {'numInvaders': -1000, 'onDefense': 100, 'invaderDistance': -10, 'stop': -100, 'reverse': -2}
+        return {'numInvaders': -1000, 'onDefense': 100, 'invaderDistance': -10, 'invaderPDistance': -20,
+                'invaderLDistance': -5, 'Boundries': -10, 'stop': -100, 'reverse': -2}
+
+    # Search for center of the maze for guarding, meaning stay at the end of its territory
+    # and if any opponent invades, kill it.
+    def getGuardBorders(self, gameState):
+        guardBorders = []
+        needle = (gameState.data.layout.width - 2) // 2
+
+        if not self.red:
+            needle += 1
+
+        for i in range(1, gameState.data.layout.height - 1):
+            if not gameState.hasWall(needle, i):
+                guardBorders.append((needle, i))
+
+        for i in range(len(guardBorders)):
+            if len(guardBorders) >= 2:
+                break
+            guardBorders.remove(guardBorders[0])
+            guardBorders.remove(guardBorders[-1])
+
+        return guardBorders
