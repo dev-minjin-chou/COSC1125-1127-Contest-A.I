@@ -236,9 +236,17 @@ class OffensiveReflexAgent(ReflexCaptureAgent):
         currentState = successor.getAgentState(self.index)
         currentPos = currentState.getPosition()
         opponents = [successor.getAgentState(oppo) for oppo in self.getOpponents(successor)]
-        # Ghost positions = [ (0,3), ... ]
-        ghostPos = [x for x in opponents if not x.isPacman and x.getPosition() is not None]
-        opponentPacmen = [y for y in opponents if y.isPacman and y.getPosition() is not None]
+        # Ghost positions stores an array of tuple i.e., [ (0,3), ... ]
+        ghostPos = []
+        opponentPacmen = []
+        for oppo in opponents:
+            if oppo.getPosition() is not None:
+                # If this opponent is not a pacman, then it's a ghost.
+                if not oppo.isPacman:
+                    ghostPos.append(oppo)
+                else:
+                    opponentPacmen.append(oppo)
+
         numFoods = len(foodList)
         distG = len(ghostPos)
         distOP = len(opponentPacmen)
@@ -275,8 +283,8 @@ class OffensiveReflexAgent(ReflexCaptureAgent):
         if distG > 0:
             evaluateG = 0.0
             dist = 0.0
-            ghostR = [ghost for ghost in ghostPos if ghost.scaredTimer == 0]
-            ghostScared = [ghost for ghost in ghostPos if ghost.scaredTimer > 0]
+            ghostR = self.getGhostPositions(ghostPos, True)
+            ghostScared = self.getGhostPositions(ghostPos, False)
             distGR = len(ghostR)
             distGS = len(ghostScared)
 
@@ -317,6 +325,15 @@ class OffensiveReflexAgent(ReflexCaptureAgent):
     def getWeights(self, gameState, action):
         return {'successorScore': 100, 'distanceToFood': -2, 'foodLeft': -2, 'distanceToCaps': -1, 'distanceToOP': -70,
                 'ghostScared': -1, 'distanceToGhost': 3, 'stop': -100, 'reverse': -2}
+
+    def getGhostPositions(self, ghostPos, isRegular):
+        tempArr = []
+        for ghost in ghostPos:
+            if isRegular and ghost.scaredTimer == 0:
+                tempArr.append(ghost)
+            elif ghost.scaredTimer > 0:
+                tempArr.append(ghost)
+        return tempArr
 
     def computeMinDistance(self, currentPos, ghosts):
         # A temp array used for finding minimum distance between current position and the ghost
