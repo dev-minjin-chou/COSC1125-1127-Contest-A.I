@@ -252,19 +252,10 @@ class OffensiveReflexAgent(ReflexCaptureAgent):
         distOP = len(opponentPacmen)
         numCaps = len(cLeft)
 
-        # blueFood = gameState.getBlueFood().asList()
-        # redFood = gameState.getRedFood().asList()
-        # if gameState.isOnRedTeam(self.index):
-        #     if len(blueFood) != 0:
-        #         features['successorScore'] = -float(len(foodList)) / len(blueFood)
-        # else:
-        #     if len(redFood) != 0:
-        #         features['successorScore'] = -float(len(foodList)) / len(redFood)
-
         # If food is nearby #
         if numFoods > 0:
             minDistance = min([self.getMazeDistance(currentPos, food) for food in foodList])
-            features['distanceToFood'] = float(minDistance) / (walls.width * walls.height)
+            features['distanceToFood'] = float(minDistance)/(walls.width * walls.height)
             features['foodLeft'] = numFoods
 
         # If caps is nearby #
@@ -274,7 +265,7 @@ class OffensiveReflexAgent(ReflexCaptureAgent):
                 minDistance = -100
             features['distanceToCaps'] = minDistance
 
-        # If opponent pacman is in our map
+        # If opponent pacman is nearby #
         if distOP > 0:
             minDistance = min([self.getMazeDistance(currentPos, i.getPosition()) for i in opponentPacmen])
             features['distanceToOP'] = minDistance + 1
@@ -299,21 +290,6 @@ class OffensiveReflexAgent(ReflexCaptureAgent):
                 if dist == 0:
                     features['ghostScared'] = -10
             features['distanceToGhost'] = evaluateG
-
-        # if len(ghostPos) > 0:
-        #     ghostEval = 0.0
-        #     scaredDistance = 0.0
-        #     regGhosts = [ghost for ghost in ghostPos if ghost.scaredTimer == 0]
-        #     scaredGhosts = [ghost for ghost in ghostPos if ghost.scaredTimer > 0]
-        #     if len(regGhosts) > 0:
-        #         ghostEval = min([self.getMazeDistance(currentPos, ghost.getPosition()) for ghost in regGhosts])
-        #         if ghostEval <= 1:  ghostEval = -float('inf')
-        #
-        #     if len(scaredGhosts) > 0:
-        #         scaredDistance = min([self.getMazeDistance(currentPos, ghost.getPosition()) for ghost in scaredGhosts])
-        #     if scaredDistance < ghostEval or ghostEval == 0:
-        #         if scaredDistance == 0: features['ghostScared'] = -10
-        #     features['distanceToGhost'] = ghostEval
 
         # Uses feature function from baselineTeam's defensiveAgent #
         if action == Directions.STOP: features['stop'] = 1
