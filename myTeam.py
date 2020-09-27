@@ -261,7 +261,7 @@ class OffensiveReflexAgent(ReflexCaptureAgent):
         if numCaps > 0:
             nearestDistance = min([self.getMazeDistance(currentPos, caps) for caps in cLeft])
             if nearestDistance == 0:
-                nearestDistance = -200
+                nearestDistance = 1000
             features['distanceToCaps'] = nearestDistance
 
         features['enemyValues'] = self.getEnemyVals(currentPos, opponentPacmen)
@@ -286,7 +286,7 @@ class OffensiveReflexAgent(ReflexCaptureAgent):
                 dist = self.computeMinDistance(currentPos, ghostScared)
             if dist < evaluateG or evaluateG == 0:
                 if dist == 0:
-                    features['ghostScared'] = 20
+                    features['ghostScared'] = 10000
             features['distanceToGhost'] = evaluateG
 
         # Uses feature function from baselineTeam's defensiveAgent #
@@ -337,12 +337,13 @@ class OffensiveReflexAgent(ReflexCaptureAgent):
     # Go home with food when time is almost up #
     def goHome(self, gameState):
         foodsCarried = gameState.getAgentState(self.index).numCarrying
-        return gameState.data.timeleft < 190 and foodsCarried > 0
+        return gameState.data.timeleft < 250 and foodsCarried > 0
 
-    # Go home with every 5 food pellet collected #
+    # Go home with every 3 food pellet collected #
     def goHomeOccasionally(self, gameState):
         foodsCarried = gameState.getAgentState(self.index).numCarrying
-        return foodsCarried > 4
+        return foodsCarried > 2
+
 
 class DefensiveReflexAgent(ReflexCaptureAgent):
     # Last food position that the agent can protect
