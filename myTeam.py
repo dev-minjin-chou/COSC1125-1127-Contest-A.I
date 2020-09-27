@@ -25,7 +25,7 @@ import game
 #################
 
 def createTeam(firstIndex, secondIndex, isRed,
-               first='OffensiveReflexAgent', second='DefensiveReflexAgent'):
+               first='TopAgent', second='BottomAgent'):
     """
     This function should return a list of two agents that will form the
     team, initialized using firstIndex and secondIndex as their agent
@@ -125,12 +125,14 @@ class ReflexCaptureAgent(CaptureAgent):
 
 
 # Uses expectimax adversial searh for now, will improve offensive agent. #
-class OffensiveReflexAgent(ReflexCaptureAgent):
+class OffensiveAndDefensiveReflexAgent(ReflexCaptureAgent):
     """
     A reflex agent that seeks food. This is an agent
     we give you to get an idea of what an offensive agent might look like,
     but it is by no means the best or only way to build an offensive agent.
     """
+
+    favorHeight = 0.0
 
     def actions(self, gameState):
         legalMoves = gameState.getLegalActions(0)
@@ -249,26 +251,23 @@ class OffensiveReflexAgent(ReflexCaptureAgent):
 
         numFoods = len(foodList)
         distG = len(ghostPos)
-        distOP = len(opponentPacmen)
         numCaps = len(cLeft)
 
         # If food is nearby #
         if numFoods > 0:
             minDistance = min([self.getMazeDistance(currentPos, food) for food in foodList])
-            features['distanceToFood'] = float(minDistance)/(walls.width * walls.height)
+            # features['distanceToFood'] = float(minDistance)/(walls.width * walls.height)
+            features['distanceToFood'] = min([self.getSmartDistance(currentPos, food) for food in foodList])
             features['foodLeft'] = numFoods
 
         # If caps is nearby #
         if numCaps > 0:
-            minDistance = min([self.getMazeDistance(currentPos, caps) for caps in cLeft])
-            if minDistance == 0:
-                minDistance = -100
-            features['distanceToCaps'] = minDistance
+            nearestDistance = min([self.getMazeDistance(currentPos, caps) for caps in cLeft])
+            if nearestDistance == 0:
+                nearestDistance = 1000
+            features['distanceToCaps'] = nearestDistance
 
-        # If opponent pacman is nearby #
-        if distOP > 0:
-            minDistance = min([self.getMazeDistance(currentPos, i.getPosition()) for i in opponentPacmen])
-            features['distanceToOP'] = minDistance + 1
+        features['enemyValues'] = self.getEnemyVals(currentPos, opponentPacmen)
 
         # If ghost is nearby #
         if distG > 0:
@@ -279,16 +278,18 @@ class OffensiveReflexAgent(ReflexCaptureAgent):
             distGR = len(ghostR)
             distGS = len(ghostScared)
 
+            # If regular ghost is near #
             if distGR > 0:
                 evaluateG = self.computeMinDistance(currentPos, ghostR)
                 if evaluateG <= 1:
                     evaluateG = -float('inf')
 
+            # If scared ghost is near #
             if distGS > 0:
                 dist = self.computeMinDistance(currentPos, ghostScared)
             if dist < evaluateG or evaluateG == 0:
                 if dist == 0:
-                    features['ghostScared'] = -10
+                    features['ghostScared'] = 10000
             features['distanceToGhost'] = evaluateG
 
         # Uses feature function from baselineTeam's defensiveAgent #
@@ -296,11 +297,18 @@ class OffensiveReflexAgent(ReflexCaptureAgent):
         rev = Directions.REVERSE[gameState.getAgentState(self.index).configuration.direction]
         if action == rev: features['reverse'] = 1
 
+        if self.goHome(gameState):
+            features['timeToGoHome'] = self.getMazeDistance(self.start, currentPos) * 100000
+
+        if self.goHomeOccasionally(gameState):
+            features['goingHome'] = self.getMazeDistance(self.start, currentPos) * 100000
+
         return features
 
     def getWeights(self, gameState, action):
-        return {'successorScore': 100, 'distanceToFood': -2, 'foodLeft': -2, 'distanceToCaps': -1, 'distanceToOP': -70,
-                'ghostScared': -1, 'distanceToGhost': 3, 'stop': -100, 'reverse': -2}
+        return {'successorScore': 100, 'distanceToFood': -2, 'foodLeft': -2, 'distanceToCaps': -1, 'ghostScared': -10,
+                'distanceToGhost': 3, 'enemyValues': -110, 'stop': -1000, 'reverse': -2, 'timeToGoHome': -20,
+                'goingHome': -10}
 
     def getGhostPositions(self, ghostPos, isRegular):
         tempArr = []
@@ -318,106 +326,39 @@ class OffensiveReflexAgent(ReflexCaptureAgent):
             ghostDistArr.append(self.getMazeDistance(currentPos, ghost.getPosition()))
         return min(ghostDistArr)
 
+    # If opponent pacman is nearby #
+    def getEnemyVals(self, currentPos, opponentPacmen):
+        numOppo = len(opponentPacmen)
+        if numOppo > 0:
+            distance = [self.getMazeDistance(currentPos, oppo.getPosition()) for oppo in opponentPacmen]
+            distLength = len(distance)
+            if distLength > 0:
+                minDistance = min(distance)
+                return minDistance
+        return 0
 
-class DefensiveReflexAgent(ReflexCaptureAgent):
-    # Last food position that the agent can protect
-    lastProtectedFood = (0, 0)
-    foods = []
-    guardPosition = (0, 0)
-    """
-    A reflex agent that keeps its side Pacman-free. Again,
-    this is to give you an idea of what a defensive agent
-    could be like.  It is not the best or only way to make
-    such an agent.
-    """
+    # Go home with food when time is almost up #
+    def goHome(self, gameState):
+        foodsCarried = gameState.getAgentState(self.index).numCarrying
+        return gameState.data.timeleft < 250 and foodsCarried > 0
 
-    def getFeatures(self, gameState, action):
-        features = util.Counter()
-        successor = self.getSuccessor(gameState, action)
+    # Go home with every 3 food pellet collected #
+    def goHomeOccasionally(self, gameState):
+        foodsCarried = gameState.getAgentState(self.index).numCarrying
+        return foodsCarried > 2
 
-        currentState = successor.getAgentState(self.index)
-        currentPos = currentState.getPosition()
-        guardBorders = self.getGuardBorders(gameState)
-        self.guardPosition = self.getGuardBorders(gameState)[len(guardBorders) - 3]
-        features['onDefense'] = 1
-        if currentState.isPacman:
-            features['onDefense'] = 0
+    def getSmartDistance(self, myPos, food):
+        return self.getMazeDistance(myPos, food) + abs(self.favorHeight - food[1])
 
-        features['Boundries'] = self.getMazeDistance(currentPos, self.guardPosition)
 
-        self.foods = self.getFoodYouAreDefending(gameState).asList()
-        # Computes distance to invaders we can see
-        enemies = [successor.getAgentState(i) for i in self.getOpponents(successor)]
-        invaders = [a for a in enemies if a.isPacman and a.getPosition() is not None]
+class TopAgent(OffensiveAndDefensiveReflexAgent):
+    def registerInitialState(self, gameState):
+        OffensiveAndDefensiveReflexAgent.registerInitialState(self, gameState)
+        self.favorHeight = gameState.data.layout.height
 
-        features['numInvaders'] = len(invaders)
-        if len(invaders) > 0:
-            dists = []
-            pos = []
-            for invader in invaders:
-                dists.append(self.getMazeDistance(currentPos, invader.getPosition()))
-                pos.append(invader.getPosition())
 
-            closestPos = pos[0]
-            closestDist = dists[0]
+class BottomAgent(OffensiveAndDefensiveReflexAgent):
+    def registerInitialState(self, gameState):
+        OffensiveAndDefensiveReflexAgent.registerInitialState(self, gameState)
+        self.favorHeight = 0.0
 
-            for i in range(len(dists)):
-                if dists[i] >= closestDist:
-                    continue
-                closestPos = pos[i]
-                closestDist = dists[i]
-
-            features['invaderPDistance'] = closestDist
-            if (features['invaderDistance'] == 1 or features['invaderPDistance'] == 1 or features[
-                'invaderLDistance'] == 1):
-                self.flag = 0
-                self.lastProtectedFood = closestPos
-                features['invaderLDistance'] = self.getMazeDistance(currentPos, self.lastProtectedFood)
-                self.foods = self.getFoodYouAreDefending(gameState).asList()
-
-            foodLength = len(self.foods)
-            # A list of food position that the agent is defending i.e., [ (x,y) ]
-            defendingFoodList = self.getFoodYouAreDefending(gameState).asList()
-            if foodLength > len(defendingFoodList):
-                # Begin chasing opponents
-                for i in range(foodLength):
-                    if foodLength <= 0 or len(defendingFoodList) <= i:
-                        continue
-                    if self.foods[i][0] != defendingFoodList[i][0] or self.foods[i][1] != defendingFoodList[i][1]:
-                        features['invaderPDistance'] = self.getMazeDistance(currentPos, self.foods[i])
-                        self.lastProtectedFood = self.foods[i]
-                        self.foods = defendingFoodList
-                        break
-
-        if action == Directions.STOP:
-            features['stop'] = 1
-        rev = Directions.REVERSE[gameState.getAgentState(self.index).configuration.direction]
-        if action == rev:
-            features['reverse'] = 1
-
-        return features
-
-    def getWeights(self, gameState, action):
-        return {'numInvaders': -1000, 'onDefense': 100, 'invaderDistance': -10, 'invaderPDistance': -20,
-                'invaderLDistance': -5, 'Boundries': -10, 'stop': -100, 'reverse': -2}
-
-    # Search for center of the maze for guarding, meaning stay at the end of its territory
-    # and if any opponent invades, kill it.
-    def getGuardBorders(self, gameState):
-        guardBorders = []
-        needle = (gameState.data.layout.width - 2) // 2
-
-        if not self.red:
-            needle += 1
-
-        for i in range(1, gameState.data.layout.height - 1):
-            if not gameState.hasWall(needle, i):
-                guardBorders.append((needle, i))
-
-        for i in range(len(guardBorders)):
-            if len(guardBorders) >= 2:
-                break
-            guardBorders.remove(guardBorders[0])
-            guardBorders.remove(guardBorders[-1])
-
-        return guardBorders
