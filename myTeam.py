@@ -249,7 +249,6 @@ class OffensiveReflexAgent(ReflexCaptureAgent):
 
         numFoods = len(foodList)
         distG = len(ghostPos)
-        distOP = len(opponentPacmen)
         numCaps = len(cLeft)
 
         # If food is nearby #
@@ -260,15 +259,12 @@ class OffensiveReflexAgent(ReflexCaptureAgent):
 
         # If caps is nearby #
         if numCaps > 0:
-            minDistance = min([self.getMazeDistance(currentPos, caps) for caps in cLeft])
-            if minDistance == 0:
-                minDistance = -100
-            features['distanceToCaps'] = minDistance
+            nearestDistance = min([self.getMazeDistance(currentPos, caps) for caps in cLeft])
+            if nearestDistance == 0:
+                nearestDistance = -200
+            features['distanceToCaps'] = nearestDistance
 
-        # If opponent pacman is nearby #
-        if distOP > 0:
-            minDistance = min([self.getMazeDistance(currentPos, i.getPosition()) for i in opponentPacmen])
-            features['distanceToOP'] = minDistance + 1
+        features['enemyValues'] = self.getEnemyVals(currentPos, opponentPacmen)
 
         # If ghost is nearby #
         if distG > 0:
@@ -279,16 +275,18 @@ class OffensiveReflexAgent(ReflexCaptureAgent):
             distGR = len(ghostR)
             distGS = len(ghostScared)
 
+            # If regular ghost is near #
             if distGR > 0:
                 evaluateG = self.computeMinDistance(currentPos, ghostR)
                 if evaluateG <= 1:
                     evaluateG = -float('inf')
 
+            # If scared ghost is near #
             if distGS > 0:
                 dist = self.computeMinDistance(currentPos, ghostScared)
             if dist < evaluateG or evaluateG == 0:
                 if dist == 0:
-                    features['ghostScared'] = -10
+                    features['ghostScared'] = 20
             features['distanceToGhost'] = evaluateG
 
         # Uses feature function from baselineTeam's defensiveAgent #
@@ -296,11 +294,18 @@ class OffensiveReflexAgent(ReflexCaptureAgent):
         rev = Directions.REVERSE[gameState.getAgentState(self.index).configuration.direction]
         if action == rev: features['reverse'] = 1
 
+        if self.goHome(gameState):
+            features['timeToGoHome'] = self.getMazeDistance(self.start, currentPos) * 100000
+
+        if self.goHomeOccasionally(gameState):
+            features['goingHome'] = self.getMazeDistance(self.start, currentPos) * 100000
+
         return features
 
     def getWeights(self, gameState, action):
-        return {'successorScore': 100, 'distanceToFood': -2, 'foodLeft': -2, 'distanceToCaps': -1, 'distanceToOP': -70,
-                'ghostScared': -1, 'distanceToGhost': 3, 'stop': -100, 'reverse': -2}
+        return {'successorScore': 100, 'distanceToFood': -2, 'foodLeft': -2, 'distanceToCaps': -1, 'ghostScared': -10,
+                'distanceToGhost': 3, 'enemyValues': -110, 'stop': -1000, 'reverse': -2, 'timeToGoHome': -20,
+                'goingHome': -10}
 
     def getGhostPositions(self, ghostPos, isRegular):
         tempArr = []
@@ -318,6 +323,26 @@ class OffensiveReflexAgent(ReflexCaptureAgent):
             ghostDistArr.append(self.getMazeDistance(currentPos, ghost.getPosition()))
         return min(ghostDistArr)
 
+    # If opponent pacman is nearby #
+    def getEnemyVals(self, currentPos, opponentPacmen):
+        numOppo = len(opponentPacmen)
+        if numOppo > 0:
+            distance = [self.getMazeDistance(currentPos, oppo.getPosition()) for oppo in opponentPacmen]
+            distLength = len(distance)
+            if distLength > 0:
+                minDistance = min(distance)
+                return minDistance
+        return 0
+
+    # Go home with food when time is almost up #
+    def goHome(self, gameState):
+        foodsCarried = gameState.getAgentState(self.index).numCarrying
+        return gameState.data.timeleft < 190 and foodsCarried > 0
+
+    # Go home with every 4 food pellet collected #
+    def goHomeOccasionally(self, gameState):
+        foodsCarried = gameState.getAgentState(self.index).numCarrying
+        return foodsCarried > 4
 
 class DefensiveReflexAgent(ReflexCaptureAgent):
     # Last food position that the agent can protect
