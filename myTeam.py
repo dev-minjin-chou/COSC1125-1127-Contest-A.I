@@ -339,7 +339,7 @@ class OffensiveReflexAgent(ReflexCaptureAgent):
         foodsCarried = gameState.getAgentState(self.index).numCarrying
         return gameState.data.timeleft < 190 and foodsCarried > 0
 
-    # Go home with every 4 food pellet collected #
+    # Go home with every 5 food pellet collected #
     def goHomeOccasionally(self, gameState):
         foodsCarried = gameState.getAgentState(self.index).numCarrying
         return foodsCarried > 4

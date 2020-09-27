@@ -8,9 +8,9 @@
 
 **Student details:**
 
-* Student 1's Student number - Full Name - Student email - Student Github id
-* Student 2's Student number - Full Name - Student email - Student Github id
-* Student 3's Student number - Full Name - Student email - Student Github id
+* Student 1's 3641315 - Minjin Chou - s3641315@student.rmit.edu.au - kuntakinte777
+* Student 2's 3679216 - Chatchapat Dechathaweewat - s3679216@student.rmit.edu.au - north23
+* Student 3's 3719036 - William David Ireland - s3719036@student.rmit.edu.au - s3719036
 
 Student number should just be the **numbers**.
 
