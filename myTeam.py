@@ -357,7 +357,10 @@ class TopAgent(OffensiveAndDefensiveReflexAgent):
         self.favorHeight = gameState.data.layout.height
 
 
-class DefensiveAgent(OffensiveAndDefensiveReflexAgent):
+SHOULD_DEFEND_COUNTER = 4
+
+
+class DefensiveAgent(ReflexCaptureAgent):
     def __init__(self, index):
         CaptureAgent.__init__(self, index)
         self.defendingArea = []
