@@ -25,7 +25,7 @@ import game
 #################
 
 def createTeam(firstIndex, secondIndex, isRed,
-               first='TopAgent', second='BottomAgent'):
+               first='TopAgent', second='DefensiveAgent'):
     """
     This function should return a list of two agents that will form the
     team, initialized using firstIndex and secondIndex as their agent
@@ -357,8 +357,40 @@ class TopAgent(OffensiveAndDefensiveReflexAgent):
         self.favorHeight = gameState.data.layout.height
 
 
-class BottomAgent(OffensiveAndDefensiveReflexAgent):
+class DefensiveAgent(OffensiveAndDefensiveReflexAgent):
+    def __init__(self, index):
+        CaptureAgent.__init__(self, index)
+        self.defendingArea = []
+
     def registerInitialState(self, gameState):
         OffensiveAndDefensiveReflexAgent.registerInitialState(self, gameState)
-        self.favorHeight = 0.0
+        self.distancer.getMazeDistances()
+        self.setPatrolArea(gameState)
 
+    def getMapLayout(self, gameState):
+        mapInfo = {}
+        width = gameState.data.layout.width
+        height = gameState.data.layout.height
+        centerX = int((width - 2) / 2)
+        centerY = int((height - 2) / 2)
+
+        mapInfo['width'] = width
+        mapInfo['height'] = height
+        mapInfo['centerX'] = centerX
+        mapInfo['centerY'] = centerY
+
+        return mapInfo
+
+    def setPatrolArea(self, gameState):
+        mapLayout = self.getMapLayout(gameState)
+
+        for i in range(1, mapLayout['height'] - 1):
+            centerX = mapLayout['centerX']
+            if not gameState.hasWall(centerX, i):
+                self.defendingArea.append((centerX, i))
+
+        # Remove defending coordinate until only one coordinate left in the defendingArea
+        while len(self.defendingArea) > 2:
+            self.defendingArea.pop()
+            # Remove last index
+            self.defendingArea = self.defendingArea[:-1]
