@@ -358,12 +358,16 @@ class TopAgent(OffensiveAndDefensiveReflexAgent):
 
 
 SHOULD_DEFEND_COUNTER = 4
+REMAINING_FOODS = 4
 
 
 class DefensiveAgent(ReflexCaptureAgent):
     def __init__(self, index):
         CaptureAgent.__init__(self, index)
         self.defendingArea = []
+        self.lastCheckedFoods = []
+        self.goal = None
+        self.counter = 0
 
     def registerInitialState(self, gameState):
         OffensiveAndDefensiveReflexAgent.registerInitialState(self, gameState)
@@ -397,3 +401,78 @@ class DefensiveAgent(ReflexCaptureAgent):
             self.defendingArea.pop()
             # Remove last index
             self.defendingArea = self.defendingArea[:-1]
+
+    def getPreferredDirections(self, gameState):
+        # Filter out unwanted actions
+        legalActions = gameState.getLegalActions(self.index)
+        legalActions.remove(Directions.STOP)
+        currentDirection = gameState.getAgentState(self.index).configuration.direction
+        reversedDir = Directions.REVERSE[currentDirection]
+        if reversedDir in legalActions:
+            legalActions.remove(reversedDir)
+
+        preferredDirections = []
+        for act in legalActions:
+            isPacman = gameState.generateSuccessor(self.index, act).getAgentState(self.index).isPacman
+            if not isPacman:
+                preferredDirections.append(act)
+
+        if len(preferredDirections) == 0:
+            self.counter = 0
+        else:
+            self.counter = self.counter + 1
+
+        if self.counter == 0 or self.counter > SHOULD_DEFEND_COUNTER:
+            preferredDirections.append(reversedDir)
+
+        return preferredDirections
+
+    def chooseAction(self, gameState):
+        foods = self.getFoodYouAreDefending(gameState).asList()
+        agentPosition = gameState.getAgentPosition(self.index)
+        if agentPosition == self.goal:
+            self.goal = None
+
+        closestEnemies = []
+        minDistance = float("inf")
+
+        enemies = [gameState.getAgentState(i) for i in self.getOpponents(gameState)]
+        invaders = []
+        for enemy in enemies:
+            if enemy.isPacman and enemy.getPosition() is not None:
+                oppentPos = enemy.getPosition()
+                invaders.append(oppentPos)
+
+        if len(invaders) > 0:
+            for enemy in invaders:
+                distance = self.getMazeDistance(enemy, agentPosition)
+                if distance < minDistance:
+                    minDistance = distance
+                    closestEnemies.append(enemy)
+            self.goal = closestEnemies[-1]
+        else:
+            # If number of current foods are less than last checked foods, it means
+            # some foods had been consumed by the enemy and the defensive agent couldn't protect it.
+            # So, set the goal to previously consumed food.
+            if len(foods) < len(self.lastCheckedFoods):
+                consumedFood = set(self.lastCheckedFoods) - set(foods)
+                self.goal = consumedFood.pop()
+
+        self.lastCheckedFoods = foods
+
+        if self.goal is None:
+            if len(foods) <= REMAINING_FOODS:
+                importantFoods = foods + self.getCapsulesYouAreDefending(gameState)
+                self.goal = random.choice(importantFoods)
+            else:
+                self.goal = random.choice(self.defendingArea)
+
+        preferredDirections = self.getPreferredDirections(gameState)
+        foodDist = []
+
+        for direction in preferredDirections:
+            newpos = gameState.generateSuccessor(self.index, direction).getAgentPosition(self.index)
+            foodDist.append(self.getMazeDistance(newpos, self.goal))
+
+        bestActions = [direction for direction, food in zip(preferredDirections, foodDist) if food == min(foodDist)]
+        return random.choice(bestActions)
