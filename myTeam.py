@@ -118,7 +118,7 @@ class OffensiveAndDefensiveAgent(ReflexCaptureAgent):
     """
 
     def __init__(self, index):
-        ReflexCaptureAgent.__init__(self, index)
+        CaptureAgent.__init__(self, index)
 
         self.agentPosition = (0, 0)
         self.agentStartPosition = (0, 0)
@@ -139,6 +139,10 @@ class OffensiveAndDefensiveAgent(ReflexCaptureAgent):
 
         if self.agentPosition == self.agentStartPosition:
             self.normalOp = True
+
+        # If the agent reaches first goal area (middle of the map)
+        if self.agentPosition == self.firstGoalArea:
+            self.normalOp = False
 
         for action in actions:
             successorGameState = gameState.generateSuccessor(self.index, action)
@@ -189,11 +193,11 @@ class OffensiveAndDefensiveAgent(ReflexCaptureAgent):
             features['foodLeft'] = numFoods
 
         # If caps is nearby #
-        if numCaps > 0:
-            nearestDistance = min([self.getMazeDistance(currentPos, caps) for caps in cLeft])
-            if nearestDistance == 0:
-                nearestDistance = 1000
-            features['distanceToCaps'] = nearestDistance
+        # if numCaps > 0:
+        #     nearestDistance = min([self.getMazeDistance(currentPos, caps) for caps in cLeft])
+        #     if nearestDistance == 0:
+        #         nearestDistance = 1000
+        #     features['distanceToCaps'] = nearestDistance
 
         # features['enemyValues'] = self.getEnemyVals(currentPos, opponentPacmen)
 
@@ -221,11 +225,11 @@ class OffensiveAndDefensiveAgent(ReflexCaptureAgent):
             features['distanceToGhost'] = evaluateG
 
         # Uses feature function from baselineTeam's defensiveAgent #
-        if action == Directions.STOP:
-            features['stop'] = 1
-        rev = Directions.REVERSE[gameState.getAgentState(self.index).configuration.direction]
-        if action == rev:
-            features['reverse'] = 1
+        # if action == Directions.STOP:
+        #     features['stop'] = 1
+        # rev = Directions.REVERSE[gameState.getAgentState(self.index).configuration.direction]
+        # if action == rev:
+        #     features['reverse'] = 1
 
         return features
 
@@ -288,7 +292,7 @@ class OffensiveAndDefensiveAgent(ReflexCaptureAgent):
 
 
 SHOULD_DEFEND_COUNTER = 4
-REMAINING_FOODS = 4
+REMAINING_FOODS = 10
 
 
 class DefensiveAgent(ReflexCaptureAgent):
@@ -314,7 +318,7 @@ class DefensiveAgent(ReflexCaptureAgent):
 
         # Remove defending coordinate until only one coordinate left in the defendingArea
         while len(self.defendingArea) > 2:
-            self.defendingArea.pop()
+            del self.defendingArea[0]
             # Remove last index
             self.defendingArea = self.defendingArea[:-1]
 
@@ -387,8 +391,8 @@ class DefensiveAgent(ReflexCaptureAgent):
         foodDist = []
 
         for direction in preferredDirections:
-            newpos = gameState.generateSuccessor(self.index, direction).getAgentPosition(self.index)
-            foodDist.append(self.getMazeDistance(newpos, self.goal))
+            pos = gameState.generateSuccessor(self.index, direction).getAgentPosition(self.index)
+            foodDist.append(self.getMazeDistance(pos, self.goal))
 
         bestActions = [direction for direction, food in zip(preferredDirections, foodDist) if food == min(foodDist)]
         return random.choice(bestActions)
