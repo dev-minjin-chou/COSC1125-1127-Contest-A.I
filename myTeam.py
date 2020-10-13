@@ -95,6 +95,21 @@ class ReflexCaptureAgent(CaptureAgent):
         return {'successorScore': 1.0}
 
 
+def getMapLayout(gameState):
+    mapInfo = {}
+    width = gameState.data.layout.width
+    height = gameState.data.layout.height
+    centerX = int((width - 2) / 2)
+    centerY = int((height - 2) / 2)
+
+    mapInfo['width'] = width
+    mapInfo['height'] = height
+    mapInfo['centerX'] = centerX
+    mapInfo['centerY'] = centerY
+
+    return mapInfo
+
+
 class OffensiveAndDefensiveAgent(ReflexCaptureAgent):
     """
     A reflex agent that seeks food. This is an agent
@@ -105,12 +120,25 @@ class OffensiveAndDefensiveAgent(ReflexCaptureAgent):
     def __init__(self, index):
         ReflexCaptureAgent.__init__(self, index)
 
-        self.normalOp = True
+        self.agentPosition = (0, 0)
+        self.agentStartPosition = (0, 0)
+        self.normalOp = False
+        self.firstGoalArea = []
+
+    def registerInitialState(self, gameState):
+        ReflexCaptureAgent.registerInitialState(self, gameState)
+        self.agentStartPosition = gameState.getAgentState(self.index).getPosition()
+        self.setFirstGoalArea(gameState)
 
     def chooseAction(self, gameState):
+        self.agentPosition = gameState.getAgentState(self.index).getPosition()
+
         actions = gameState.getLegalActions(self.index)
         actions.remove(Directions.STOP)
         scores = []
+
+        if self.agentPosition == self.agentStartPosition:
+            self.normalOp = True
 
         for action in actions:
             successorGameState = gameState.generateSuccessor(self.index, action)
@@ -118,7 +146,7 @@ class OffensiveAndDefensiveAgent(ReflexCaptureAgent):
             if self.normalOp:
                 successor = self.getSuccessor(gameState, action)
                 position = successor.getAgentPosition(self.index)
-                scores.append(self.getMazeDistance(position, self.start))
+                scores.append(self.getMazeDistance(position, self.firstGoalArea[0]))
             else:
                 for i in range(1, 24):
                     score += self.simulateMonteCarlo(successorGameState, 12)
@@ -170,27 +198,27 @@ class OffensiveAndDefensiveAgent(ReflexCaptureAgent):
         # features['enemyValues'] = self.getEnemyVals(currentPos, opponentPacmen)
 
         # If ghost is nearby #
-        if distG > 0:
-            evaluateG = 0.0
-            dist = 0.0
-            ghostR = self.getGhostPositions(ghostPos, True)
-            ghostScared = self.getGhostPositions(ghostPos, False)
-            distGR = len(ghostR)
-            distGS = len(ghostScared)
-
-            # If regular ghost is near #
-            if distGR > 0:
-                evaluateG = self.computeMinDistance(currentPos, ghostR)
-                if evaluateG <= 1:
-                    evaluateG = -float('inf')
-
-            # If scared ghost is near #
-            if distGS > 0:
-                dist = self.computeMinDistance(currentPos, ghostScared)
-            if dist < evaluateG or evaluateG == 0:
-                if dist == 0:
-                    features['ghostScared'] = 10000
-            features['distanceToGhost'] = evaluateG
+        # if distG > 0:
+        #     evaluateG = 0.0
+        #     dist = 0.0
+        #     ghostR = self.getGhostPositions(ghostPos, True)
+        #     ghostScared = self.getGhostPositions(ghostPos, False)
+        #     distGR = len(ghostR)
+        #     distGS = len(ghostScared)
+        #
+        #     # If regular ghost is near #
+        #     if distGR > 0:
+        #         evaluateG = self.computeMinDistance(currentPos, ghostR)
+        #         if evaluateG <= 1:
+        #             evaluateG = -float('inf')
+        #
+        #     # If scared ghost is near #
+        #     if distGS > 0:
+        #         dist = self.computeMinDistance(currentPos, ghostScared)
+        #     if dist < evaluateG or evaluateG == 0:
+        #         if dist == 0:
+        #             features['ghostScared'] = 10
+        #     features['distanceToGhost'] = evaluateG
 
         # Uses feature function from baselineTeam's defensiveAgent #
         if action == Directions.STOP:
@@ -214,6 +242,12 @@ class OffensiveAndDefensiveAgent(ReflexCaptureAgent):
             elif ghost.scaredTimer > 0:
                 tempArr.append(ghost)
         return tempArr
+
+    def setFirstGoalArea(self, gameState):
+        mapInfo = getMapLayout(gameState)
+        for i in range(1, mapInfo['height'] - 1):
+            if not gameState.hasWall(mapInfo['centerX'], i):
+                self.firstGoalArea.append((mapInfo['centerX'], i))
 
     def computeMinDistance(self, currentPos, ghosts):
         # A temp array used for finding minimum distance between current position and the ghost
@@ -270,22 +304,8 @@ class DefensiveAgent(ReflexCaptureAgent):
         self.distancer.getMazeDistances()
         self.setPatrolArea(gameState)
 
-    def getMapLayout(self, gameState):
-        mapInfo = {}
-        width = gameState.data.layout.width
-        height = gameState.data.layout.height
-        centerX = int((width - 2) / 2)
-        centerY = int((height - 2) / 2)
-
-        mapInfo['width'] = width
-        mapInfo['height'] = height
-        mapInfo['centerX'] = centerX
-        mapInfo['centerY'] = centerY
-
-        return mapInfo
-
     def setPatrolArea(self, gameState):
-        mapLayout = self.getMapLayout(gameState)
+        mapLayout = getMapLayout(gameState)
 
         for i in range(1, mapLayout['height'] - 1):
             centerX = mapLayout['centerX']
