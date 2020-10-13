@@ -25,7 +25,7 @@ import game
 #################
 
 def createTeam(firstIndex, secondIndex, isRed,
-               first='TopAgent', second='DefensiveAgent'):
+               first='OffensiveAndDefensiveAgent', second='DefensiveAgent'):
     """
     This function should return a list of two agents that will form the
     team, initialized using firstIndex and secondIndex as their agent
@@ -57,35 +57,6 @@ class ReflexCaptureAgent(CaptureAgent):
     def registerInitialState(self, gameState):
         self.start = gameState.getAgentPosition(self.index)
         CaptureAgent.registerInitialState(self, gameState)
-
-    def chooseAction(self, gameState):
-        """
-        Picks among the actions with the highest Q(s,a).
-        """
-        actions = gameState.getLegalActions(self.index)
-
-        # You can profile your evaluation time by uncommenting these lines
-        # start = time.time()
-        values = [self.evaluate(gameState, a) for a in actions]
-        # print 'eval time for agent %d: %.4f' % (self.index, time.time() - start)
-
-        maxValue = max(values)
-        bestActions = [a for a, v in zip(actions, values) if v == maxValue]
-
-        foodLeft = len(self.getFood(gameState).asList())
-
-        if foodLeft <= 2:
-            bestDist = 9999
-            for action in actions:
-                successor = self.getSuccessor(gameState, action)
-                pos2 = successor.getAgentPosition(self.index)
-                dist = self.getMazeDistance(self.start, pos2)
-                if dist < bestDist:
-                    bestAction = action
-                    bestDist = dist
-            return bestAction
-
-        return random.choice(bestActions)
 
     def getSuccessor(self, gameState, action):
         """
@@ -124,107 +95,38 @@ class ReflexCaptureAgent(CaptureAgent):
         return {'successorScore': 1.0}
 
 
-# Uses expectimax adversial searh for now, will improve offensive agent. #
-class OffensiveAndDefensiveReflexAgent(ReflexCaptureAgent):
+class OffensiveAndDefensiveAgent(ReflexCaptureAgent):
     """
     A reflex agent that seeks food. This is an agent
     we give you to get an idea of what an offensive agent might look like,
     but it is by no means the best or only way to build an offensive agent.
     """
 
-    favorHeight = 0.0
+    def __init__(self, index):
+        ReflexCaptureAgent.__init__(self, index)
 
-    def actions(self, gameState):
-        legalMoves = gameState.getLegalActions(0)
+        self.normalOp = True
+
+    def chooseAction(self, gameState):
+        actions = gameState.getLegalActions(self.index)
+        actions.remove(Directions.STOP)
         scores = []
-        # Choose one of the best actions
-        for move in legalMoves:
-            successorGameState = gameState.generateSuccessor(0, move)
-            scores.append(self.value(successorGameState, 1, 0))
-        bestScore = max(scores)
-        bestIndices = []
 
-        for index in range(len(scores)):
-            if scores[index] != bestScore:
-                continue
-            bestIndices.append(index)
-
-        chosenIndex = random.choice(bestIndices)  # Pick randomly among the best
-        return legalMoves[chosenIndex]
-
-    def value(self, gameState, agent, currentDepth):
-        if gameState.isLose() or len(
-                gameState.getLegalActions(0)) == 0 or self.depth == currentDepth or gameState.isWin():
-            return self.evaluationFunction(gameState)
-
-        if agent > 0 or agent < 0:
-            return self.getExpValue(gameState, agent, currentDepth)
-        else:
-            return self.getMaxValue(gameState, currentDepth)
-
-    def getMaxValue(self, gameState, currentDepth):
-        maximum = -9999
-        legalMoves = gameState.getLegalActions(0)
-        tempArr = []
-        for move in legalMoves:
-            tempArr.append(max(maximum, self.value(gameState.generateSuccessor(0, move), 1, currentDepth)))
-        return max(tempArr)
-
-    def getExpValue(self, gameState, agent, currentDepth):
-        minimum = 0
-        if agent == gameState.getNumAgents():
-            currentDepth += 1
-            return self.value(gameState, 0, currentDepth)
-        legalMoves = gameState.getLegalActions(agent)
-        for move in legalMoves:
-            minimum += self.value(gameState.generateSuccessor(agent, move), agent + 1, currentDepth)
-        return minimum / len(legalMoves)
-
-    def evaluationFunction(gameState):
-
-        rValue = random.getrandbits(256)
-        largeV = 100000
-        currentP = gameState.getPacmanPosition()
-        currFood = gameState.getFood().asList()
-        foodD = []
-        ghostD = []
-        currGPosition = gameState.getGhostPositions()
-
-        rtrnVal = 0
-        if gameState.isWin():
-            rtrnVal += largeV
-        elif gameState.isLose():
-            rtrnVal -= largeV
-
-        minFoodDistance = 1
-        for i in currFood:
-            rangeDist = manhattanDistance(currentP, i)
-            foodD.append(rangeDist)
-            # Look for closest food. #
-            minFoodDistance = min(foodD[0], rangeDist)
-
-        for j in currGPosition:
-            ghostD.append(manhattanDistance(currentP, j))
-
-        for g in ghostD:
-            if g < 2:
-                return -(rValue + largeV)
-            elif currentP == g:
-                return -(rValue + largeV)
-
-        rfVal = 1
-        # Numbers of foods left. #
-        rFoods = gameState.getNumFood()
-        rfVal += rFoods * 999999
-
-        # Numbers of capsules left.#
-        cLeft = gameState.getCapsules()
-        numCLeft = len(cLeft)
-        ncLeft = 1
-        ncLeft += numCLeft * 9999999
-
-        # Better evaluation function hence take into account the additional factors. #
-        return gameState.getScore() + (1 / minFoodDistance + rtrnVal) * (1 / rfVal * 1 / ncLeft)
+        for action in actions:
+            successorGameState = gameState.generateSuccessor(self.index, action)
+            score = 0
+            if self.normalOp:
+                successor = self.getSuccessor(gameState, action)
+                position = successor.getAgentPosition(self.index)
+                scores.append(self.getMazeDistance(position, self.start))
+            else:
+                for i in range(1, 24):
+                    score += self.simulateMonteCarlo(successorGameState, 12)
+                scores.append(score)
+        best = min(scores)
+        bestActions = [a for a, v in zip(actions, scores) if v == best]
+        bestAction = random.choice(bestActions)
+        return bestAction
 
     def getFeatures(self, gameState, action):
         features = util.Counter()
@@ -234,7 +136,6 @@ class OffensiveAndDefensiveReflexAgent(ReflexCaptureAgent):
         features['successorScore'] = self.getScore(successor)
 
         # Get all states of ghost, food, opponent pacman, walls.
-        walls = gameState.getWalls()
         currentState = successor.getAgentState(self.index)
         currentPos = currentState.getPosition()
         opponents = [successor.getAgentState(oppo) for oppo in self.getOpponents(successor)]
@@ -256,8 +157,7 @@ class OffensiveAndDefensiveReflexAgent(ReflexCaptureAgent):
         # If food is nearby #
         if numFoods > 0:
             minDistance = min([self.getMazeDistance(currentPos, food) for food in foodList])
-            # features['distanceToFood'] = float(minDistance)/(walls.width * walls.height)
-            features['distanceToFood'] = min([self.getSmartDistance(currentPos, food) for food in foodList])
+            features['distanceToFood'] = minDistance
             features['foodLeft'] = numFoods
 
         # If caps is nearby #
@@ -267,7 +167,7 @@ class OffensiveAndDefensiveReflexAgent(ReflexCaptureAgent):
                 nearestDistance = 1000
             features['distanceToCaps'] = nearestDistance
 
-        features['enemyValues'] = self.getEnemyVals(currentPos, opponentPacmen)
+        # features['enemyValues'] = self.getEnemyVals(currentPos, opponentPacmen)
 
         # If ghost is nearby #
         if distG > 0:
@@ -293,15 +193,11 @@ class OffensiveAndDefensiveReflexAgent(ReflexCaptureAgent):
             features['distanceToGhost'] = evaluateG
 
         # Uses feature function from baselineTeam's defensiveAgent #
-        if action == Directions.STOP: features['stop'] = 1
+        if action == Directions.STOP:
+            features['stop'] = 1
         rev = Directions.REVERSE[gameState.getAgentState(self.index).configuration.direction]
-        if action == rev: features['reverse'] = 1
-
-        if self.goHome(gameState):
-            features['timeToGoHome'] = self.getMazeDistance(self.start, currentPos) * 100000
-
-        if self.goHomeOccasionally(gameState):
-            features['goingHome'] = self.getMazeDistance(self.start, currentPos) * 100000
+        if action == rev:
+            features['reverse'] = 1
 
         return features
 
@@ -337,24 +233,24 @@ class OffensiveAndDefensiveReflexAgent(ReflexCaptureAgent):
                 return minDistance
         return 0
 
-    # Go home with food when time is almost up #
-    def goHome(self, gameState):
-        foodsCarried = gameState.getAgentState(self.index).numCarrying
-        return gameState.data.timeleft < 250 and foodsCarried > 0
+    def simulateMonteCarlo(self, gameState, rounds):
+        simulatedState = gameState.deepCopy()
+        while rounds > 0:
+            simulatedAction = self.randomChooseOneDesirableAction(simulatedState)
+            simulatedState = simulatedState.generateSuccessor(self.index, simulatedAction)
+            rounds = rounds - 1
+        return self.evaluate(simulatedState, Directions.STOP)
 
-    # Go home with every 3 food pellet collected #
-    def goHomeOccasionally(self, gameState):
-        foodsCarried = gameState.getAgentState(self.index).numCarrying
-        return foodsCarried > 2
-
-    def getSmartDistance(self, myPos, food):
-        return self.getMazeDistance(myPos, food) + abs(self.favorHeight - food[1])
-
-
-class TopAgent(OffensiveAndDefensiveReflexAgent):
-    def registerInitialState(self, gameState):
-        OffensiveAndDefensiveReflexAgent.registerInitialState(self, gameState)
-        self.favorHeight = gameState.data.layout.height
+    def randomChooseOneDesirableAction(self, simulatedState):
+        actionsBase = simulatedState.getLegalActions(self.index)
+        actionsBase.remove(Directions.STOP)
+        if len(actionsBase) == 1:
+            return actionsBase[0]
+        else:
+            backwardsDirection = Directions.REVERSE[simulatedState.getAgentState(self.index).configuration.direction]
+            if backwardsDirection in actionsBase:
+                actionsBase.remove(backwardsDirection)
+            return random.choice(actionsBase)
 
 
 SHOULD_DEFEND_COUNTER = 4
@@ -370,7 +266,7 @@ class DefensiveAgent(ReflexCaptureAgent):
         self.counter = 0
 
     def registerInitialState(self, gameState):
-        OffensiveAndDefensiveReflexAgent.registerInitialState(self, gameState)
+        ReflexCaptureAgent.registerInitialState(self, gameState)
         self.distancer.getMazeDistances()
         self.setPatrolArea(gameState)
 
