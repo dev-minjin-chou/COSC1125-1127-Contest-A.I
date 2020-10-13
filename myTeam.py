@@ -358,7 +358,7 @@ class TopAgent(OffensiveAndDefensiveReflexAgent):
 
 
 SHOULD_DEFEND_COUNTER = 4
-REMAINING_FOODS = 4
+REMAINING_FOODS = 10
 
 
 class DefensiveAgent(ReflexCaptureAgent):
@@ -398,7 +398,7 @@ class DefensiveAgent(ReflexCaptureAgent):
 
         # Remove defending coordinate until only one coordinate left in the defendingArea
         while len(self.defendingArea) > 2:
-            self.defendingArea.pop()
+            del self.defendingArea[0]
             # Remove last index
             self.defendingArea = self.defendingArea[:-1]
 
