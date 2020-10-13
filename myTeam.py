@@ -198,27 +198,27 @@ class OffensiveAndDefensiveAgent(ReflexCaptureAgent):
         # features['enemyValues'] = self.getEnemyVals(currentPos, opponentPacmen)
 
         # If ghost is nearby #
-        # if distG > 0:
-        #     evaluateG = 0.0
-        #     dist = 0.0
-        #     ghostR = self.getGhostPositions(ghostPos, True)
-        #     ghostScared = self.getGhostPositions(ghostPos, False)
-        #     distGR = len(ghostR)
-        #     distGS = len(ghostScared)
-        #
-        #     # If regular ghost is near #
-        #     if distGR > 0:
-        #         evaluateG = self.computeMinDistance(currentPos, ghostR)
-        #         if evaluateG <= 1:
-        #             evaluateG = -float('inf')
-        #
-        #     # If scared ghost is near #
-        #     if distGS > 0:
-        #         dist = self.computeMinDistance(currentPos, ghostScared)
-        #     if dist < evaluateG or evaluateG == 0:
-        #         if dist == 0:
-        #             features['ghostScared'] = 10
-        #     features['distanceToGhost'] = evaluateG
+        if distG > 0:
+            evaluateG = 0.0
+            dist = 0.0
+            ghostR = self.getGhostPositions(ghostPos, True)
+            ghostScared = self.getGhostPositions(ghostPos, False)
+            distGR = len(ghostR)
+            distGS = len(ghostScared)
+
+            # If regular ghost is near #
+            if distGR > 0:
+                evaluateG = self.computeMinDistance(currentPos, ghostR)
+                if evaluateG <= 1:
+                    evaluateG = -float('inf')
+
+            # If scared ghost is near #
+            if distGS > 0:
+                dist = self.computeMinDistance(currentPos, ghostScared)
+            if dist < evaluateG or evaluateG == 0:
+                if dist == 0:
+                    features['ghostScared'] = 10
+            features['distanceToGhost'] = evaluateG
 
         # Uses feature function from baselineTeam's defensiveAgent #
         if action == Directions.STOP:
@@ -270,12 +270,12 @@ class OffensiveAndDefensiveAgent(ReflexCaptureAgent):
     def simulateMonteCarlo(self, gameState, rounds):
         simulatedState = gameState.deepCopy()
         while rounds > 0:
-            simulatedAction = self.randomChooseOneDesirableAction(simulatedState)
+            simulatedAction = self.decidingFavorableActions(simulatedState)
             simulatedState = simulatedState.generateSuccessor(self.index, simulatedAction)
             rounds = rounds - 1
         return self.evaluate(simulatedState, Directions.STOP)
 
-    def randomChooseOneDesirableAction(self, simulatedState):
+    def decidingFavorableActions(self, simulatedState):
         actionsBase = simulatedState.getLegalActions(self.index)
         actionsBase.remove(Directions.STOP)
         if len(actionsBase) == 1:
