@@ -25,8 +25,8 @@ You can structure your wiki pages in many different sections and styles. The abo
 
 List here the full name, email, and student number for each member of the team:
 
-* Student 1's Full Name - Student email - RMIT Student number
-* Student 2's Full Name - Student email - RMIT Student number
+* Student 1's Minjin Chou - s3641315@student.rmit.edu.au - 3641315
+* Student 2's Chatchapat Dechathaweewat - s3679216@student.rmit.edu.au - 3679216
 * Student 3's Full Name - Student email - RMIT Student number
 * Student 4's Full Name - Student email - RMIT Student number
 
