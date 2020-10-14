@@ -4,18 +4,20 @@ You can include screenshots of precompetition results and animated gifs, to show
 
 ## First Agent Team - Heuristic Offensive and Defensive Agents
 ----
-
+#### Strategy summary
 The first team composition we tried out were 2 heuristic agents that used expectimax adversarial search. One agent was tasked with travelling to the opponent's end of the board and collecting food, the other was tasked with standing guard at the border of our end of the board, and chasing down enemy agents that made it past the border.
 
 ### Demo
 
 ![Demo 1](images/demo1.gif)
 
-#### Competition results: Position - 46/53 | No staff teams beaten
+#### Competition: Daily (27/09 3:19am)
+#### Results: Position - 38/53 | No staff teams beaten
 
-![Demo 1](images/comp1standing.PNG)
+![Demo 1](images/27-09_leaderboard.png)
 
-#### Strategy summary
+#### Results summary
+We only managed to beat staff_team_basic once, and every other staff team match was lost. We were 2 places beneath staff_team_basic on the leaderboard, so ultimately there needed to be a lot more work done to make the agents perform better.
 
 | Pros | Cons |
 |-----------------|:-------------|
