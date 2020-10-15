@@ -1,7 +1,5 @@
 # RMIT COSC1125/1127 AI Pacman Contest Project
 
-This Wiki can be used as external documentation to the project.
-
 1. [Home and Introduction]()
 2. [Design Choices (Offense/Defense)](Design-Choices)
 
@@ -12,9 +10,6 @@ This Wiki can be used as external documentation to the project.
     2.3 [Approach Three](AI-Method-3)
 3. [Evolution and Experiments](Evolution)
 4. [Conclusions and Reflections](Conclusions-and-Reflections)
-
-
-You can structure your wiki pages in many different sections and styles. The above is just one reasonable example.
 
 # Youtube presentation
 
