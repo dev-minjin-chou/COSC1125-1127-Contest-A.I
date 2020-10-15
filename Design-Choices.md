@@ -10,5 +10,6 @@ _General comments about the project goes here_
 ## Comments per topic
 
 ## Offense
+For offense we have tried multiple AI techniques for this agent. 
 
 ## Defense
