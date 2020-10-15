@@ -22,7 +22,7 @@ The first team composition we tried out were 2 heuristic agents that used expect
 #### Competition: Daily (27/09 3:19am)
 #### Results: Position - 38/53 | No staff teams beaten
 
-![Demo 1](images/27-09_leaderboard.png)
+![(27-09) Leaderboard](images/27-09_leaderboard.png)
 
 #### Results summary
 We only managed to beat staff_team_basic once, and every other staff team match was lost. We were 2 places beneath staff_team_basic on the leaderboard, so ultimately there needed to be a lot more work done to make the agents perform better.
@@ -32,20 +32,29 @@ We only managed to beat staff_team_basic once, and every other staff team match 
 | First body part | Second cell  |
 | Second line     | foo          |
 ----
-## My Second Agent - Approach fOO
+## Second Agent Team - Heuristic Offensive Agents
 ----
+#### Strategy summary
+We learnt through some testing and observing other teams that having multiple offensive agents was a good choice. We took our original offensive agent and tweaked it further so that it would patrol different regions of the board to cover the most distance.
 
-
-Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
 ### Demo
 
-![Demo 1](images/demo1.gif)
+*1. Ghosts keeping their distance from Pacman*
 
-#### Competition results: Position - 21/37 | Percentile - 57%
+![(prelim) Ghosts keeping distance from pacman](images/prelim_ghost.gif)
 
-![Demo 1](images/standing1.png)
+*2. Ghosts trap Pacman, but are stuck and refuse to eat him*
 
-#### Strategy summary
+![(prelim) Ghosts trap pacman](images/prelim_stuck.gif)
+
+#### Competition: Preliminary
+#### Results: Position - 59/69 | No staff teams beaten
+
+![Demo 1](images/prelim_leaderboard.png)
+
+#### Results summary
+We were beaten by every staff team, except for one match with staff_team_top, although that was most likely random luck. As the agents would rarely ever eat any opponents, but would still chase them around the board, we would lose a large majority of matches as long as the opponents managed to get at least 1 pellet.
+
 
 | Pros | Cons |
 |-----------------|:-------------|
