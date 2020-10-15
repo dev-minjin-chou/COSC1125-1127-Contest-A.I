@@ -8,13 +8,19 @@ The first team composition we tried out were 2 heuristic agents that used expect
 ### Demo
 
 ![(27/09) Chasing Enemy](images/27-09_chase_enemy.gif)
+
 *1. Both agents chasing after the same opponent*
 
+
 ![(27/09) Stuck in loop](images/27-09_loop.gif) 
+
 *2. Both agents stuck in the same loop*
 
+
 ![(27/09) Misusing Power Pellets](images/27-09_power.gif)
+
 *3. Offense agent giving power pellets little value*
+
 
 #### Competition: Daily (27/09 3:19am)
 #### Results: Position - 38/53 | No staff teams beaten
