@@ -1,7 +1,5 @@
 # Evolution of the approach
 
-You can include screenshots of precompetition results and animated gifs, to showcase the evolution of your agents.
-
 ## First Agent Team - Heuristic Offensive and Defensive Agents
 ----
 #### Strategy summary
