@@ -49,14 +49,21 @@ def createTeam(firstIndex, secondIndex, isRed,
 # Agents #
 ##########
 
+# Define global constants for representing the weights of features
+# Flags for offensive agent
+TRUE = 1
+FALSE = 0
+ENFORCE_OFFENSE = 20
+GHOST_SAFE_DISTANCE = 5
+
+# Flags for defensive agent
+REMAINING_FOODS = 4
+SHOULD_DEFEND_COUNTER = 4
+
 class ReflexCaptureAgent(CaptureAgent):
     """
     A base class for reflex agents that chooses score-maximizing actions
     """
-
-    def registerInitialState(self, gameState):
-        self.start = gameState.getAgentPosition(self.index)
-        CaptureAgent.registerInitialState(self, gameState)
 
     def getSuccessor(self, gameState, action):
         """
@@ -109,9 +116,7 @@ def getMapLayout(gameState):
 
     return mapInfo
 
-
-class OffensiveAndDefensiveAgent(ReflexCaptureAgent):
-# Uses expectimax adversial searh for now, will improve offensive agent. #
+#
 class OffensiveAgent(ReflexCaptureAgent):
     """
     A reflex agent that seeks food. This is an agent
@@ -164,74 +169,37 @@ class OffensiveAgent(ReflexCaptureAgent):
 
     def getFeatures(self, gameState, action):
         features = util.Counter()
-        successor = self.getSuccessor(gameState, action)
-        foodList = self.getFood(successor).asList()
-        cLeft = self.getCapsules(gameState)
-        features['successorScore'] = self.getScore(successor)
 
-        # Get all states of ghost, food, opponent pacman, walls.
-        walls = gameState.getWalls()
-        currentState = successor.getAgentState(self.index)
-        currentPos = currentState.getPosition()
-        opponents = [successor.getAgentState(oppo) for oppo in self.getOpponents(successor)]
-        # Ghost positions stores an array of tuple i.e., [ (0,3), ... ]
-        ghostPos = []
-        opponentPacmen = []
-        for oppo in opponents:
-            if oppo.getPosition() is not None:
-                # If this opponent is not a pacman, then it's a ghost.
-                if not oppo.isPacman:
-                    ghostPos.append(oppo)
-                else:
-                    opponentPacmen.append(oppo)
+        successor = self.getSuccessor(gameState, action)  # get the successor
+        myPos = successor.getAgentState(self.index).getPosition()  # get the successor pos
+        foodList = self.getFood(successor).asList()  # get the foodlist
+        features['successorScore'] = self.getScore(successor)  # set score feature
 
-        numFoods = len(foodList)
-        distG = len(ghostPos)
-        numCaps = len(cLeft)
+        # if the agent at the successor's pos becomes an pacman,
+        if successor.getAgentState(self.index).isPacman:
+            features['forcedOffensive'] = TRUE
+        else:
+            features['forcedOffensive'] = FALSE
 
-        # If food is nearby #
-        if numFoods > 0:
-            minDistance = min([self.getMazeDistance(currentPos, food) for food in foodList])
+        # Compute distance to the nearest food
+        if len(foodList) > 0:  # This should always be True,  but better safe than sorry
+            minDistance = min([self.getMazeDistance(myPos, food) for food in foodList])
             features['distanceToFood'] = minDistance
-            features['foodLeft'] = numFoods
 
-        # If caps is nearby #
-        # if numCaps > 0:
-        #     nearestDistance = min([self.getMazeDistance(currentPos, caps) for caps in cLeft])
-        #     if nearestDistance == 0:
-        #         nearestDistance = 1000
-        #     features['distanceToCaps'] = nearestDistance
+        # Compute distance to the ghost so that we can consider if the ghost is chasing our pacman
+        distancesToGhosts = []
+        # Get all opponent ghosts's positions
+        for oppoIndex in self.getOpponents(successor):
+            oppo = successor.getAgentState(oppoIndex)
+            if not oppo.isPacman and oppo.getPosition() is not None:
+                distancesToGhosts.append(self.getMazeDistance(myPos, oppo.getPosition()))
 
-        # Chase enemy
-        # features['enemyValues'] = self.getEnemyVals(currentPos, opponentPacmen)
-
-        # If ghost is nearby #
-        if distG > 0:
-            evaluateG = 0.0
-            # dist = 0.0
-            ghostR = self.getGhostPositions(ghostPos, True)
-            ghostScared = self.getGhostPositions(ghostPos, False)
-            distGR = len(ghostR)
-            # distGS = len(ghostScared)
-
-            # If regular ghost is near #
-            if distGR > 0:
-                evaluateG = self.computeMinDistance(currentPos, ghostR)
-
-            # If scared ghost is near #
-            # if distGS > 0:
-            #     dist = self.computeMinDistance(currentPos, ghostScared)
-            # if dist < evaluateG or evaluateG == 0:
-            #     if dist == 0:
-            #         features['ghostScared'] = 10
-            features['distanceToGhost'] = evaluateG
-
-        # Uses feature function from baselineTeam's defensiveAgent #
-        # if action == Directions.STOP:
-        #     features['stop'] = 1
-        # rev = Directions.REVERSE[gameState.getAgentState(self.index).configuration.direction]
-        # if action == rev:
-        #     features['reverse'] = 1
+        if len(distancesToGhosts) > 0:
+            minDisToGhost = min(distancesToGhosts)
+            if minDisToGhost < GHOST_SAFE_DISTANCE:
+                features['distanceToGhost'] = minDisToGhost + features['successorScore']
+            else:
+                features['distanceToGhost'] = 0
 
         return features
 
