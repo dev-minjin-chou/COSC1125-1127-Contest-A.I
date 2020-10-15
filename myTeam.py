@@ -25,7 +25,7 @@ import game
 #################
 
 def createTeam(firstIndex, secondIndex, isRed,
-               first='OffensiveAndDefensiveAgent', second='DefensiveAgent'):
+               first='TopAgent', second='DefensiveAgent'):
     """
     This function should return a list of two agents that will form the
     team, initialized using firstIndex and secondIndex as their agent
@@ -111,6 +111,8 @@ def getMapLayout(gameState):
 
 
 class OffensiveAndDefensiveAgent(ReflexCaptureAgent):
+# Uses expectimax adversial searh for now, will improve offensive agent. #
+class OffensiveAgent(ReflexCaptureAgent):
     """
     A reflex agent that seeks food. This is an agent
     we give you to get an idea of what an offensive agent might look like,
@@ -168,6 +170,7 @@ class OffensiveAndDefensiveAgent(ReflexCaptureAgent):
         features['successorScore'] = self.getScore(successor)
 
         # Get all states of ghost, food, opponent pacman, walls.
+        walls = gameState.getWalls()
         currentState = successor.getAgentState(self.index)
         currentPos = currentState.getPosition()
         opponents = [successor.getAgentState(oppo) for oppo in self.getOpponents(successor)]
@@ -199,29 +202,28 @@ class OffensiveAndDefensiveAgent(ReflexCaptureAgent):
         #         nearestDistance = 1000
         #     features['distanceToCaps'] = nearestDistance
 
+        # Chase enemy
         # features['enemyValues'] = self.getEnemyVals(currentPos, opponentPacmen)
 
         # If ghost is nearby #
         if distG > 0:
             evaluateG = 0.0
-            dist = 0.0
+            # dist = 0.0
             ghostR = self.getGhostPositions(ghostPos, True)
             ghostScared = self.getGhostPositions(ghostPos, False)
             distGR = len(ghostR)
-            distGS = len(ghostScared)
+            # distGS = len(ghostScared)
 
             # If regular ghost is near #
             if distGR > 0:
                 evaluateG = self.computeMinDistance(currentPos, ghostR)
-                if evaluateG <= 1:
-                    evaluateG = -float('inf')
 
             # If scared ghost is near #
-            if distGS > 0:
-                dist = self.computeMinDistance(currentPos, ghostScared)
-            if dist < evaluateG or evaluateG == 0:
-                if dist == 0:
-                    features['ghostScared'] = 10
+            # if distGS > 0:
+            #     dist = self.computeMinDistance(currentPos, ghostScared)
+            # if dist < evaluateG or evaluateG == 0:
+            #     if dist == 0:
+            #         features['ghostScared'] = 10
             features['distanceToGhost'] = evaluateG
 
         # Uses feature function from baselineTeam's defensiveAgent #
@@ -304,9 +306,23 @@ class DefensiveAgent(ReflexCaptureAgent):
         self.counter = 0
 
     def registerInitialState(self, gameState):
-        ReflexCaptureAgent.registerInitialState(self, gameState)
+        CaptureAgent.registerInitialState(self, gameState)
         self.distancer.getMazeDistances()
         self.setPatrolArea(gameState)
+
+    def getMapLayout(self, gameState):
+        mapInfo = {}
+        width = gameState.data.layout.width
+        height = gameState.data.layout.height
+        centerX = int((width - 2) / 2)
+        centerY = int((height - 2) / 2)
+
+        mapInfo['width'] = width
+        mapInfo['height'] = height
+        mapInfo['centerX'] = centerX
+        mapInfo['centerY'] = centerY
+
+        return mapInfo
 
     def setPatrolArea(self, gameState):
         mapLayout = getMapLayout(gameState)
