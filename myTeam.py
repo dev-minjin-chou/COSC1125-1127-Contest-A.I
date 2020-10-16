@@ -136,53 +136,148 @@ class OffensiveAgent(ReflexCaptureAgent):
 
     def __init__(self, index):
         CaptureAgent.__init__(self, index)
+        self.startingPosition = (0, 0)
 
-        self.agentPosition = (0, 0)
-        self.agentStartPosition = (0, 0)
-        self.normalOp = False
-        self.firstGoalArea = []
-        self.shouldAttack = False
-        self.shouldGoBack = 0
-        self.unmoveableList = []
+        self.currentFoodSize = 10000000
         self.prevPostions = {}
+        self.myPos = (-5, -5)
+        self.counter = 0
+        self.shouldAttack = False
+        self.lastTickFoodList = []
+        self.foodList = []
+        self.shouldGoBack = 0
+        self.homeTarget = None
+        self.unmoveableList = []
+        self.switchTargetMode = False
+        self.modeTarget = None
+        self.foodFastEaten = 0
+        self.basicOperation = False
+        self.amountOfCapsules = 0
+        self.lastAmountCapsules = 0
+
+        self.firstGoalArea = []
 
     def registerInitialState(self, gameState):
-        ReflexCaptureAgent.registerInitialState(self, gameState)
-        self.agentStartPosition = gameState.getAgentState(self.index).getPosition()
-        self.setFirstGoalArea(gameState)
+        CaptureAgent.registerInitialState(self, gameState)
+        self.distancer.getMazeDistances()
+        self.startingPosition = gameState.getAgentState(self.index).getPosition()
+        self.setInitialObjective(gameState)
 
     def chooseAction(self, gameState):
-        self.agentPosition = gameState.getAgentState(self.index).getPosition()
+        self.myPos = gameState.getAgentState(self.index).getPosition()
 
-        actions = gameState.getLegalActions(self.index)
-        actions.remove(Directions.STOP)
-        scores = []
+        if self.myPos == self.startingPosition:
+            self.basicOperation = True
 
-        if self.agentPosition == self.agentStartPosition:
-            self.normalOp = True
+        if self.myPos == self.firstGoal[0]:
+            self.basicOperation = False
 
-        # If the agent reaches first goal area (middle of the map)
-        if self.agentPosition == self.firstGoalArea:
-            self.normalOp = False
+        if self.basicOperation:
+            actions = gameState.getLegalActions(self.index)
+            actions.remove(Directions.STOP)
+            foodDistances = []
 
-        for action in actions:
-            successorGameState = gameState.generateSuccessor(self.index, action)
-            score = 0
-            if self.normalOp:
-                successor = self.getSuccessor(gameState, action)
-                position = successor.getAgentPosition(self.index)
-                scores.append(self.getMazeDistance(position, self.firstGoalArea[0]))
+            for act in actions:
+                newState = gameState.generateSuccessor(self.index, act)
+                currentPos = newState.getAgentPosition(self.index)
+                foodDistances.append(self.getMazeDistance(currentPos, self.firstGoal[0]))
+
+            best = min(foodDistances)
+            bestActions = [a for a, v in zip(actions, foodDistances) if v == best]
+            bestAction = random.choice(bestActions)
+            return bestAction
+
+        if not self.basicOperation:
+            self.foodList = self.getFood(gameState).asList()
+            self.amountOfCapsules = len(self.getCapsules(gameState))
+
+            realLastFoodLen = len(self.lastTickFoodList)
+
+            if len(self.foodList) < len(self.lastTickFoodList):
+                self.shouldGoBack = 1
+            self.lastTickFoodList = self.foodList
+            self.lastAmountCapsules = self.amountOfCapsules
+
+            if not gameState.getAgentState(self.index).isPacman:
+                self.shouldGoBack = 0
+
+            self.shouldAttack = self.compelledToAttack(gameState)
+
+            legalActions = gameState.getLegalActions(self.index)
+            legalActions.remove(Directions.STOP)
+
+            oppoDistances = []
+            opponentsIndices = self.getOpponents(gameState)
+            for opponentIndex in opponentsIndices:
+                oppoState = gameState.getAgentState(opponentIndex)
+                if not oppoState.isPacman and oppoState.getPosition() is not None and oppoState.scaredTimer <= 0:
+                    dist = self.getMazeDistance(self.myPos, oppoState.getPosition())
+                    oppoDistances.append(dist)
+
+            minDistance = min(oppoDistances)
+
+            actions = []
+            for a in legalActions:
+                if minDistance > 3 and self.refineActions(gameState, a, 6):
+                    actions.append(a)
+                elif self.refineDangerousActions(gameState, a, 9):
+                    actions.append(a)
+
+            self.shouldAvoidStuck(gameState)
+            if self.amountOfCapsules < self.lastAmountCapsules:
+                self.switchTargetMode = True
+                self.foodFastEaten = 0
+            if minDistance <= 5:
+                self.switchTargetMode = False
+            if len(self.foodList) < len(self.lastTickFoodList):
+                self.switchTargetMode = False
+
+            if self.switchTargetMode:
+                if not gameState.getAgentState(self.index).isPacman:
+                    self.foodFastEaten = 0
+
+                modeMinDistance = float("inf")
+
+                if len(self.foodList) < realLastFoodLen:
+                    self.foodFastEaten += 1
+
+                # If there's no food nearby or carrying foods >= MIN_COLLECTED_FOODS, go home (starting position)
+                if len(self.foodList) == 0 or self.foodFastEaten >= MIN_COLLECTED_FOODS:
+                    self.modeTarget = self.startingPosition
+                else:
+                    for food in self.foodList:
+                        distance = self.getMazeDistance(self.myPos, food)
+                        if distance < modeMinDistance:
+                            modeMinDistance = distance
+                            self.modeTarget = food
+
+                actions = gameState.getLegalActions(self.index)
+                actions.remove(Directions.STOP)
+                foodDistances = []
+
+                for a in actions:
+                    currentPos = gameState.generateSuccessor(self.index, a).getAgentPosition(self.index)
+                    foodDistances.append(self.getMazeDistance(currentPos, self.modeTarget))
+
+                best = min(foodDistances)
+                bestActions = [a for a, v in zip(actions, foodDistances) if v == best]
+                bestAction = random.choice(bestActions)
+                return bestAction
+
             else:
-                self.shouldAvoidStuck(gameState)
-                self.shouldAttack = self.compelledToAttack(gameState)
+                self.foodFastEaten = 0
+                monteCarloValues = []
+                for a in actions:
+                    newState = gameState.generateSuccessor(self.index, a)
+                    value = 0
+                    for i in range(1, 24):
+                        value += self.monteCarlo(newState, 12)
+                    monteCarloValues.append(value)
 
-                for i in range(1, 24):
-                    score += self.monteCarlo(successorGameState, 12)
-                scores.append(score)
-        best = min(scores)
-        bestActions = [a for a, v in zip(actions, scores) if v == best]
-        bestAction = random.choice(bestActions)
-        return bestAction
+                maxMonteCarlo = max(monteCarloValues)
+                bestActions = [a for a, v in zip(actions, monteCarloValues) if v == maxMonteCarlo]
+                bestAction = random.choice(bestActions)
+            return bestAction
 
     def getFeatures(self, gameState, action):
         features = util.Counter()
@@ -349,6 +444,19 @@ class OffensiveAgent(ReflexCaptureAgent):
             elif ghost.scaredTimer > 0:
                 tempArr.append(ghost)
         return tempArr
+
+    def setInitialObjective(self, gameState):
+        mapLayout = getMapLayout(gameState)
+        self.firstGoal = []
+        for i in range(1, mapLayout['height'] - 1):
+            centerX = int(mapLayout['centerX'])
+            if not gameState.hasWall(centerX, i):
+                self.firstGoal.append((centerX, i))
+        while len(self.firstGoal) > 2:
+            del self.firstGoal[0]
+            self.firstGoal = self.firstGoal[:-1]
+        if len(self.firstGoal) == 2:
+            self.firstGoal.remove(self.firstGoal[0])
 
     def setFirstGoalArea(self, gameState):
         mapInfo = getMapLayout(gameState)
