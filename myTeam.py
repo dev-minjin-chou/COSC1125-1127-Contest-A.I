@@ -275,6 +275,63 @@ class OffensiveAgent(ReflexCaptureAgent):
             rounds = rounds - 1
         return self.evaluate(simulatedState, Directions.STOP)
 
+    def refineActions(self, gameState, action, rounds):
+        if rounds == 0:
+            return True
+
+        currentState = gameState.generateSuccessor(self.index, action)
+        currentScore = self.getScore(gameState)
+        newScore = self.getScore(currentState)
+        currentFoods = self.getFood(gameState).asList()
+        newFoods = self.getFood(currentState).asList()
+        if currentScore < newScore:
+            return True
+
+        actions = currentState.getLegalActions(self.index)
+        actions.remove(Directions.STOP)
+        currentDirection = currentState.getAgentState(self.index).configuration.direction
+        reversedDirection = Directions.REVERSE[currentDirection]
+        if reversedDirection in actions:
+            if len(currentFoods) != len(newFoods):
+                return True
+            else:
+                actions.remove(reversedDirection)
+
+        if len(actions) == 0:
+            return False
+
+        for action in actions:
+            if self.refineActions(currentState, action, rounds - 1):
+                return True
+        return False
+
+    def refineDangerousActions(self, gameState, action, rounds):
+        if rounds == 0:
+            return True
+
+        currentState = gameState.generateSuccessor(self.index, action)
+        currentScore = self.getScore(gameState)
+        newScore = self.getScore(currentState)
+        if currentScore < newScore:
+            return True
+
+        actions = currentState.getLegalActions(self.index)
+        actions.remove(Directions.STOP)
+        currentDirection = currentState.getAgentState(self.index).configuration.direction
+        reversedDirection = Directions.REVERSE[currentDirection]
+        if reversedDirection in actions:
+            actions.remove(reversedDirection)
+        else:
+            return True
+
+        if len(actions) == 0:
+            return False
+
+        for action in actions:
+            if self.refineDangerousActions(currentState, action, rounds - 1):
+                return True
+        return False
+
     def getGhostPositions(self, ghostPos, isRegular):
         tempArr = []
         for ghost in ghostPos:
