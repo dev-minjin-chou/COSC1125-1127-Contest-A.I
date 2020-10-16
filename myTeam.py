@@ -61,10 +61,13 @@ WEIGHT_SCARED_GHOST = 0
 WEIGHT_NORMAL_GHOST = 210
 WEIGHT_SHOULD_ATTACK = 3000
 WEIGHT_SHOULD_GO_BACK = 0
+SHOULD_AVOID_STUCK = 1
+MIN_COLLECTED_FOODS = 5
 
 # Flags for defensive agent
 REMAINING_FOODS = 4
 SHOULD_DEFEND_COUNTER = 4
+
 
 class ReflexCaptureAgent(CaptureAgent):
     """
@@ -122,6 +125,7 @@ def getMapLayout(gameState):
 
     return mapInfo
 
+
 #
 class OffensiveAgent(ReflexCaptureAgent):
     """
@@ -139,6 +143,8 @@ class OffensiveAgent(ReflexCaptureAgent):
         self.firstGoalArea = []
         self.shouldAttack = False
         self.shouldGoBack = 0
+        self.unmoveableList = []
+        self.prevPostions = {}
 
     def registerInitialState(self, gameState):
         ReflexCaptureAgent.registerInitialState(self, gameState)
@@ -167,6 +173,9 @@ class OffensiveAgent(ReflexCaptureAgent):
                 position = successor.getAgentPosition(self.index)
                 scores.append(self.getMazeDistance(position, self.firstGoalArea[0]))
             else:
+                self.shouldAvoidStuck(gameState)
+                self.shouldAttack = self.compelledToAttack(gameState)
+
                 for i in range(1, 24):
                     score += self.monteCarlo(successorGameState, 12)
                 scores.append(score)
@@ -346,6 +355,53 @@ class OffensiveAgent(ReflexCaptureAgent):
         for i in range(1, mapInfo['height'] - 1):
             if not gameState.hasWall(mapInfo['centerX'], i):
                 self.firstGoalArea.append((mapInfo['centerX'], i))
+
+    def compelledToAttack(self, gameState):
+        remainingFoods = self.getFood(gameState).asList()
+
+        if len(remainingFoods) != self.currentFoodSize:
+            self.currentFoodSize = len(remainingFoods)
+            self.counter = 0
+        else:
+            self.counter = self.counter + 1
+
+        initialPosition = gameState.getInitialAgentPosition(self.index)
+        currentPosition = gameState.getAgentState(self.index).getPosition()
+        if initialPosition == currentPosition:
+            self.counter = 0
+        if self.counter <= ENFORCE_OFFENSE:
+            return False
+        else:
+            return True
+
+    def shouldAvoidStuck(self, gameState):
+        total = 0
+        self.myPos = gameState.getAgentState(self.index).getPosition()
+
+        if len(self.unmoveableList) > 9:
+            self.unmoveableList.pop(0)
+        if self.myPos == self.prevPostions[2] and self.myPos == self.prevPostions[4]:
+            if self.prevPostions[1] == self.prevPostions[3]:
+                self.unmoveableList.append(1)
+            else:
+                self.unmoveableList.append(1)
+        else:
+            self.unmoveableList.append(0)
+        self.prevPostions[4] = self.prevPostions[3]
+        self.prevPostions[3] = self.prevPostions[2]
+        self.prevPostions[2] = self.prevPostions[1]
+        self.prevPostions[1] = self.prevPostions[0]
+
+        if len(self.unmoveableList) < 9:
+            return False
+        else:
+            for i in range(len(self.unmoveableList)):
+                total += self.unmoveableList[i]
+            if total > SHOULD_AVOID_STUCK:
+                self.switchTargetMode = True
+                return True
+            else:
+                return False
 
     def computeMinDistance(self, currentPos, ghosts):
         # A temp array used for finding minimum distance between current position and the ghost
