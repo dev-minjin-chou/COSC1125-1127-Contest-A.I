@@ -12,8 +12,10 @@
 # Pieter Abbeel (pabbeel@cs.berkeley.edu).
 
 
+import random
+import util
+
 from captureAgents import CaptureAgent
-import random, util
 from game import Directions
 from util import nearestPoint
 
@@ -166,7 +168,7 @@ class OffensiveAgent(ReflexCaptureAgent):
                 scores.append(self.getMazeDistance(position, self.firstGoalArea[0]))
             else:
                 for i in range(1, 24):
-                    score += self.simulateMonteCarlo(successorGameState, 12)
+                    score += self.monteCarlo(successorGameState, 12)
                 scores.append(score)
         best = min(scores)
         bestActions = [a for a, v in zip(actions, scores) if v == best]
@@ -305,14 +307,6 @@ class OffensiveAgent(ReflexCaptureAgent):
                 minDistance = min(distance)
                 return minDistance
         return 0
-
-    def simulateMonteCarlo(self, gameState, rounds):
-        simulatedState = gameState.deepCopy()
-        while rounds > 0:
-            simulatedAction = self.decidingFavorableActions(simulatedState)
-            simulatedState = simulatedState.generateSuccessor(self.index, simulatedAction)
-            rounds = rounds - 1
-        return self.evaluate(simulatedState, Directions.STOP)
 
     def decidingFavorableActions(self, simulatedState):
         actionsBase = simulatedState.getLegalActions(self.index)
