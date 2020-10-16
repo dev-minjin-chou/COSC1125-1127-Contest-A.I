@@ -13,11 +13,9 @@
 
 
 from captureAgents import CaptureAgent
-import random, time, util
+import random, util
 from game import Directions
 from util import nearestPoint
-from util import manhattanDistance
-import game
 
 
 #################
