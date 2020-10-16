@@ -185,17 +185,16 @@ class OffensiveReflexAgent(ReflexCaptureAgent):
             legalActions = gameState.getLegalActions(self.index)
             legalActions.remove(Directions.STOP)
 
-            oppoDistances = []
+            minDistance = float("inf")
+
             opponentsIndices = self.getOpponents(gameState)
             for opponentIndex in opponentsIndices:
-                oppoState = gameState.getAgentState(opponentIndex)
-                if not oppoState.isPacman and oppoState.getPosition() is not None and oppoState.scaredTimer <= 0:
-                    dist = self.getMazeDistance(self.myPos, oppoState.getPosition())
-                    oppoDistances.append(dist)
-
-            minDistance = float("inf")
-            if len(oppoDistances) > 0:
-                minDistance = min(oppoDistances)
+                oppo = gameState.getAgentState(opponentIndex)
+                if not oppo.isPacman and oppo.getPosition() is not None and not oppo.scaredTimer > 0:
+                    oppentPos = oppo.getPosition()
+                    dist = self.getMazeDistance(self.myPos, oppentPos)
+                    if dist < minDistance:
+                        minDistance = dist
 
             actions = []
             for a in legalActions:
@@ -483,6 +482,16 @@ class OffensiveReflexAgent(ReflexCaptureAgent):
                 else:
                     return False
 
+            if len(self.unmoveableList) < 9:
+                return False
+            else:
+                for i in range(len(self.unmoveableList)):
+                    total += self.unmoveableList[i]
+                if total > SHOULD_AVOID_STUCK:
+                    self.switchTargetMode = True
+                    return True
+                else:
+                    return False
 
 class DefensiveReflexAgent(ReflexCaptureAgent):
     def __init__(self, index):
