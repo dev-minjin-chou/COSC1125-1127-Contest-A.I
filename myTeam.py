@@ -55,6 +55,12 @@ TRUE = 1
 FALSE = 0
 ENFORCE_OFFENSE = 20
 GHOST_SAFE_DISTANCE = 5
+WEIGHT_SCORE = 200
+WEIGHT_FOOD = -5
+WEIGHT_SCARED_GHOST = 0
+WEIGHT_NORMAL_GHOST = 210
+WEIGHT_SHOULD_ATTACK = 3000
+WEIGHT_SHOULD_GO_BACK = 0
 
 # Flags for defensive agent
 REMAINING_FOODS = 4
@@ -259,10 +265,6 @@ class OffensiveAgent(ReflexCaptureAgent):
             if backwardsDirection in actionsBase:
                 actionsBase.remove(backwardsDirection)
             return random.choice(actionsBase)
-
-
-SHOULD_DEFEND_COUNTER = 4
-REMAINING_FOODS = 10
 
 
 class DefensiveAgent(ReflexCaptureAgent):
