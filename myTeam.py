@@ -25,7 +25,7 @@ import game
 #################
 
 def createTeam(firstIndex, secondIndex, isRed,
-               first='TopAgent', second='DefensiveAgent'):
+               first='OffensiveAgent', second='DefensiveAgent'):
     """
     This function should return a list of two agents that will form the
     team, initialized using firstIndex and secondIndex as their agent
@@ -137,6 +137,8 @@ class OffensiveAgent(ReflexCaptureAgent):
         self.agentStartPosition = (0, 0)
         self.normalOp = False
         self.firstGoalArea = []
+        self.shouldAttack = False
+        self.shouldGoBack = 0
 
     def registerInitialState(self, gameState):
         ReflexCaptureAgent.registerInitialState(self, gameState)
@@ -210,9 +212,68 @@ class OffensiveAgent(ReflexCaptureAgent):
         return features
 
     def getWeights(self, gameState, action):
-        return {'successorScore': 100, 'distanceToFood': -2, 'foodLeft': -2, 'distanceToCaps': -1, 'ghostScared': -10,
-                'distanceToGhost': 3, 'enemyValues': -110, 'stop': -1000, 'reverse': -2, 'timeToGoHome': -20,
-                'goingHome': -10}
+
+        if self.shouldAttack:
+            if self.shouldGoBack == 0:
+                return {'forcedOffensive': WEIGHT_SHOULD_ATTACK,
+                        'successorScore': WEIGHT_SCORE,
+                        'distanceToFood': WEIGHT_FOOD,
+                        'distancesToGhost': WEIGHT_NORMAL_GHOST}
+            else:
+                return {'forcedOffensive': WEIGHT_SHOULD_GO_BACK,
+                        'successorScore': WEIGHT_SCORE,
+                        'distanceToFood': WEIGHT_FOOD,
+                        'distancesToGhost': WEIGHT_NORMAL_GHOST}
+
+        successor = self.getSuccessor(gameState, action)  # get the successor
+        myPos = successor.getAgentState(self.index).getPosition()  # get the successor pos
+
+        # Compute distance to the ghost so that we can consider if the ghost is chasing our pacman
+        minDistance = 10000000
+        scaredGhost = []
+        ghostScared = False
+        # Get all opponent ghosts's positions
+        for oppoIndex in self.getOpponents(successor):
+            oppo = successor.getAgentState(oppoIndex)
+
+            if not oppo.isPacman and oppo.getPosition() is not None:
+                dist = self.getMazeDistance(myPos, oppo.getPosition())
+                if dist < minDistance:
+                    minDistance = dist
+                    scaredGhost.append(oppo)
+
+        if len(scaredGhost) > 0:
+            if scaredGhost[-1].scaredTimer > 0:
+                ghostScared = True
+
+        if ghostScared:
+            weightGhost = WEIGHT_SCARED_GHOST
+        else:
+            weightGhost = WEIGHT_NORMAL_GHOST
+
+        return {'forcedOffensive': WEIGHT_SHOULD_GO_BACK,
+                'successorScore': WEIGHT_SCORE,
+                'distanceToFood': WEIGHT_FOOD,
+                'distancesToGhost': weightGhost}
+
+    def preferrableAction(self, simulatedState):
+        actions = simulatedState.getLegalActions(self.index)
+        actions.remove(Directions.STOP)
+        if len(actions) == 1:
+            return actions[0]
+        else:
+            reversedDir = Directions.REVERSE[simulatedState.getAgentState(self.index).configuration.direction]
+            if reversedDir in actions:
+                actions.remove(reversedDir)
+            return random.choice(actions)
+
+    def monteCarlo(self, gameState, rounds):
+        simulatedState = gameState.deepCopy()
+        while rounds > 0:
+            simulatedAction = self.preferrableAction(simulatedState)
+            simulatedState = simulatedState.generateSuccessor(self.index, simulatedAction)
+            rounds = rounds - 1
+        return self.evaluate(simulatedState, Directions.STOP)
 
     def getGhostPositions(self, ghostPos, isRegular):
         tempArr = []
