@@ -23,7 +23,6 @@ List here the full name, email, and student number for each member of the team:
 * Minjin Chou - s3641315@student.rmit.edu.au - 3641315
 * Chatchapat Dechathaweewat - s3679216@student.rmit.edu.au - 3679216
 * William David Ireland - s3719036@student.rmit.edu.au - 3719036
-* Mehedi Hasan Ridoy    -s3763633@student.rmit.edu.au-s3763633
 
 
 ## Useful links - Wiki features
