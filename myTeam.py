@@ -1,21 +1,6 @@
-# myTeam.py
-# ---------
-# Licensing Information:  You are free to use or extend these projects for
-# educational purposes provided that (1) you do not distribute or publish
-# solutions, (2) you retain this notice, and (3) you provide clear
-# attribution to UC Berkeley, including a link to http://ai.berkeley.edu.
-# 
-# Attribution Information: The Pacman AI projects were developed at UC Berkeley.
-# The core projects and autograders were primarily created by John DeNero
-# (denero@cs.berkeley.edu) and Dan Klein (klein@cs.berkeley.edu).
-# Student side autograding was added by Brad Miller, Nick Hay, and
-# Pieter Abbeel (pabbeel@cs.berkeley.edu).
-
-
+from captureAgents import CaptureAgent
 import random
 import util
-
-from captureAgents import CaptureAgent
 from game import Directions
 from util import nearestPoint
 
@@ -25,13 +10,12 @@ from util import nearestPoint
 #################
 
 def createTeam(firstIndex, secondIndex, isRed,
-               first='OffensiveAgent', second='DefensiveAgent'):
+               first='OffensiveReflexAgent', second='DefensiveReflexAgent'):
     """
     This function should return a list of two agents that will form the
     team, initialized using firstIndex and secondIndex as their agent
     index numbers.  isRed is True if the red team is being created, and
     will be False if the blue team is being created.
-
     As a potentially helpful development aid, this function can take
     additional string-valued keyword arguments ("first" and "second" are
     such arguments in the case of this function), which will come from
@@ -40,8 +24,6 @@ def createTeam(firstIndex, secondIndex, isRed,
     any extra arguments, so you should make sure that the default
     behavior is what you want for the nightly contest.
     """
-
-    # The following line is an example only; feel free to change it.
     return [eval(first)(firstIndex), eval(second)(secondIndex)]
 
 
@@ -55,6 +37,7 @@ TRUE = 1
 FALSE = 0
 ENFORCE_OFFENSE = 20
 GHOST_SAFE_DISTANCE = 5
+# Feature weights
 WEIGHT_SCORE = 200
 WEIGHT_FOOD = -5
 WEIGHT_SCARED_GHOST = 0
@@ -70,9 +53,6 @@ SHOULD_DEFEND_COUNTER = 4
 
 
 class ReflexCaptureAgent(CaptureAgent):
-    """
-    A base class for reflex agents that chooses score-maximizing actions
-    """
 
     def getSuccessor(self, gameState, action):
         """
@@ -92,6 +72,7 @@ class ReflexCaptureAgent(CaptureAgent):
         """
         features = self.getFeatures(gameState, action)
         weights = self.getWeights(gameState, action)
+
         return features * weights
 
     def getFeatures(self, gameState, action):
@@ -126,8 +107,7 @@ def getMapLayout(gameState):
     return mapInfo
 
 
-#
-class OffensiveAgent(ReflexCaptureAgent):
+class OffensiveReflexAgent(ReflexCaptureAgent):
     """
     A reflex agent that seeks food. This is an agent
     we give you to get an idea of what an offensive agent might look like,
@@ -151,11 +131,10 @@ class OffensiveAgent(ReflexCaptureAgent):
         self.switchTargetMode = False
         self.modeTarget = None
         self.foodFastEaten = 0
+        self.firstGoal = []
         self.basicOperation = False
         self.amountOfCapsules = 0
         self.lastAmountCapsules = 0
-
-        self.firstGoalArea = []
 
     def registerInitialState(self, gameState):
         CaptureAgent.registerInitialState(self, gameState)
@@ -206,15 +185,16 @@ class OffensiveAgent(ReflexCaptureAgent):
             legalActions = gameState.getLegalActions(self.index)
             legalActions.remove(Directions.STOP)
 
-            oppoDistances = []
+            minDistance = float("inf")
+
             opponentsIndices = self.getOpponents(gameState)
             for opponentIndex in opponentsIndices:
-                oppoState = gameState.getAgentState(opponentIndex)
-                if not oppoState.isPacman and oppoState.getPosition() is not None and oppoState.scaredTimer <= 0:
-                    dist = self.getMazeDistance(self.myPos, oppoState.getPosition())
-                    oppoDistances.append(dist)
-
-            minDistance = min(oppoDistances)
+                oppo = gameState.getAgentState(opponentIndex)
+                if not oppo.isPacman and oppo.getPosition() is not None and not oppo.scaredTimer > 0:
+                    oppentPos = oppo.getPosition()
+                    dist = self.getMazeDistance(self.myPos, oppentPos)
+                    if dist < minDistance:
+                        minDistance = dist
 
             actions = []
             for a in legalActions:
@@ -280,7 +260,9 @@ class OffensiveAgent(ReflexCaptureAgent):
             return bestAction
 
     def getFeatures(self, gameState, action):
+        # init
         features = util.Counter()
+        # features = {}.fromkeys(['forcedOffensive','successorScore','distanceToFood','distanceToGhost'])
 
         successor = self.getSuccessor(gameState, action)  # get the successor
         myPos = successor.getAgentState(self.index).getPosition()  # get the successor pos
@@ -295,6 +277,7 @@ class OffensiveAgent(ReflexCaptureAgent):
 
         # Compute distance to the nearest food
         if len(foodList) > 0:  # This should always be True,  but better safe than sorry
+            # myPos = successor.getAgentState(self.index).getPosition()
             minDistance = min([self.getMazeDistance(myPos, food) for food in foodList])
             features['distanceToFood'] = minDistance
 
@@ -436,15 +419,6 @@ class OffensiveAgent(ReflexCaptureAgent):
                 return True
         return False
 
-    def getGhostPositions(self, ghostPos, isRegular):
-        tempArr = []
-        for ghost in ghostPos:
-            if isRegular and ghost.scaredTimer == 0:
-                tempArr.append(ghost)
-            elif ghost.scaredTimer > 0:
-                tempArr.append(ghost)
-        return tempArr
-
     def setInitialObjective(self, gameState):
         mapLayout = getMapLayout(gameState)
         self.firstGoal = []
@@ -457,12 +431,6 @@ class OffensiveAgent(ReflexCaptureAgent):
             self.firstGoal = self.firstGoal[:-1]
         if len(self.firstGoal) == 2:
             self.firstGoal.remove(self.firstGoal[0])
-
-    def setFirstGoalArea(self, gameState):
-        mapInfo = getMapLayout(gameState)
-        for i in range(1, mapInfo['height'] - 1):
-            if not gameState.hasWall(mapInfo['centerX'], i):
-                self.firstGoalArea.append((mapInfo['centerX'], i))
 
     def compelledToAttack(self, gameState):
         remainingFoods = self.getFood(gameState).asList()
@@ -488,60 +456,34 @@ class OffensiveAgent(ReflexCaptureAgent):
 
         if len(self.unmoveableList) > 9:
             self.unmoveableList.pop(0)
-        if self.myPos == self.prevPostions[2] and self.myPos == self.prevPostions[4]:
-            if self.prevPostions[1] == self.prevPostions[3]:
-                self.unmoveableList.append(1)
-            else:
-                self.unmoveableList.append(1)
-        else:
-            self.unmoveableList.append(0)
-        self.prevPostions[4] = self.prevPostions[3]
-        self.prevPostions[3] = self.prevPostions[2]
-        self.prevPostions[2] = self.prevPostions[1]
-        self.prevPostions[1] = self.prevPostions[0]
 
-        if len(self.unmoveableList) < 9:
-            return False
-        else:
-            for i in range(len(self.unmoveableList)):
-                total += self.unmoveableList[i]
-            if total > SHOULD_AVOID_STUCK:
-                self.switchTargetMode = True
-                return True
+        if 2 in self.prevPostions and 2 in self.prevPostions:
+            if self.myPos == self.prevPostions[2] and self.myPos == self.prevPostions[4]:
+                if self.prevPostions[1] == self.prevPostions[3]:
+                    self.unmoveableList.append(1)
+                else:
+                    self.unmoveableList.append(1)
             else:
+                self.unmoveableList.append(0)
+
+            self.prevPostions[4] = self.prevPostions[3]
+            self.prevPostions[3] = self.prevPostions[2]
+            self.prevPostions[2] = self.prevPostions[1]
+            self.prevPostions[1] = self.prevPostions[0]
+
+            if len(self.unmoveableList) < 9:
                 return False
-
-    def computeMinDistance(self, currentPos, ghosts):
-        # A temp array used for finding minimum distance between current position and the ghost
-        ghostDistArr = []
-        for ghost in ghosts:
-            ghostDistArr.append(self.getMazeDistance(currentPos, ghost.getPosition()))
-        return min(ghostDistArr)
-
-    # If opponent pacman is nearby #
-    def getEnemyVals(self, currentPos, opponentPacmen):
-        numOppo = len(opponentPacmen)
-        if numOppo > 0:
-            distance = [self.getMazeDistance(currentPos, oppo.getPosition()) for oppo in opponentPacmen]
-            distLength = len(distance)
-            if distLength > 0:
-                minDistance = min(distance)
-                return minDistance
-        return 0
-
-    def decidingFavorableActions(self, simulatedState):
-        actionsBase = simulatedState.getLegalActions(self.index)
-        actionsBase.remove(Directions.STOP)
-        if len(actionsBase) == 1:
-            return actionsBase[0]
-        else:
-            backwardsDirection = Directions.REVERSE[simulatedState.getAgentState(self.index).configuration.direction]
-            if backwardsDirection in actionsBase:
-                actionsBase.remove(backwardsDirection)
-            return random.choice(actionsBase)
+            else:
+                for i in range(len(self.unmoveableList)):
+                    total += self.unmoveableList[i]
+                if total > SHOULD_AVOID_STUCK:
+                    self.switchTargetMode = True
+                    return True
+                else:
+                    return False
 
 
-class DefensiveAgent(ReflexCaptureAgent):
+class DefensiveReflexAgent(ReflexCaptureAgent):
     def __init__(self, index):
         CaptureAgent.__init__(self, index)
         self.defendingArea = []
@@ -554,25 +496,11 @@ class DefensiveAgent(ReflexCaptureAgent):
         self.distancer.getMazeDistances()
         self.setPatrolArea(gameState)
 
-    def getMapLayout(self, gameState):
-        mapInfo = {}
-        width = gameState.data.layout.width
-        height = gameState.data.layout.height
-        centerX = int((width - 2) / 2)
-        centerY = int((height - 2) / 2)
-
-        mapInfo['width'] = width
-        mapInfo['height'] = height
-        mapInfo['centerX'] = centerX
-        mapInfo['centerY'] = centerY
-
-        return mapInfo
-
     def setPatrolArea(self, gameState):
         mapLayout = getMapLayout(gameState)
 
         for i in range(1, mapLayout['height'] - 1):
-            centerX = mapLayout['centerX']
+            centerX = int(mapLayout['centerX'])
             if not gameState.hasWall(centerX, i):
                 self.defendingArea.append((centerX, i))
 
