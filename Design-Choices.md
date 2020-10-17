@@ -13,8 +13,6 @@ _General comments about the project goes here_
 ## Comments per topic
 
 ## Offense
-For offense we have tried multiple AI techniques for this agent.For the offensive agent we have used Q-learning and Monte Carlo technique.
-In the preliminary contest we had used Expectimax algorithm which was not much efficient. 
-
+For offense we have tried multiple AI techniques for this agent.
 ## Defense
 
