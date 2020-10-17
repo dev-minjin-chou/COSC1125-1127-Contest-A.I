@@ -1,6 +1,6 @@
 # Evolution of the approach
 
-## First Agent Team - Heuristic Offensive and Defensive Agents
+## First Agent Team - Expectimax Offensive and Defensive Agents
 ----
 #### Strategy summary
 The first team composition we tried out were 2 heuristic agents that used expectimax adversarial search. One agent was tasked with travelling to the opponent's end of the board and collecting food, the other was tasked with standing guard at the border of our end of the board, and chasing down enemy agents that made it past the border.
@@ -33,7 +33,7 @@ We only managed to beat staff_team_basic once, and every other staff team match 
 | | Was easily confused, getting stuck in loops |
 | | Didn't make very good use of power pellets |
 ----
-## Second Agent Team - Heuristic Offensive Agents
+## Second Agent Team - Expectimax Offensive Agents
 ----
 #### Strategy summary
 We learnt through some testing and observing other teams that having multiple offensive agents was a good choice. We took our original offensive agent and tweaked it further so that it would patrol different regions of the board to cover the most distance.
