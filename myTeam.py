@@ -112,7 +112,7 @@ class OffensiveReflexAgent(ReflexCaptureAgent):
         self.shouldGoBack = 0
         self.homeTarget = None
         self.unmoveableList = []
-        self.shouldComputeMonteCarlo = False
+        self.basicBattleStrategy = False
         self.modeTarget = None
         self.rapidConsumeQuota = 0
         self.firstGoal = []
@@ -260,12 +260,12 @@ class OffensiveReflexAgent(ReflexCaptureAgent):
         self.shouldAvoidStuck(gameState)
 
         if self.lastAmountCapsules > self.amountOfCapsules:
-            self.shouldComputeMonteCarlo = True
+            self.basicBattleStrategy = True
             self.rapidConsumeQuota = 0
         if shortestDistance <= 5:
-            self.shouldComputeMonteCarlo = False
+            self.basicBattleStrategy = False
         if len(self.lastFoodList) > len(self.foodList):
-            self.shouldComputeMonteCarlo = False
+            self.basicBattleStrategy = False
 
         return self.getActionFromMonteCarlo(gameState, shortestDistance)
 
@@ -280,7 +280,7 @@ class OffensiveReflexAgent(ReflexCaptureAgent):
             elif self.refineDangerousActions(gameState, act, 9):
                 actions.append(act)
 
-        if self.shouldComputeMonteCarlo:
+        if self.basicBattleStrategy:
             if not gameState.getAgentState(self.index).isPacman:
                 self.rapidConsumeQuota = 0
 
@@ -301,11 +301,7 @@ class OffensiveReflexAgent(ReflexCaptureAgent):
 
             actions = gameState.getLegalActions(self.index)
             actions.remove(Directions.STOP)
-            foodDistances = []
-
-            for a in actions:
-                currentPos = gameState.generateSuccessor(self.index, a).getAgentPosition(self.index)
-                foodDistances.append(self.getMazeDistance(currentPos, self.modeTarget))
+            foodDistances = [self.getMazeDistance(gameState.generateSuccessor(self.index, act).getAgentPosition(self.index), self.modeTarget) for act in actions]
 
             best = min(foodDistances)
             bestActions = [a for a, v in zip(actions, foodDistances) if v == best]
@@ -340,19 +336,18 @@ class OffensiveReflexAgent(ReflexCaptureAgent):
             return True
 
         currentState = gameState.generateSuccessor(self.index, action)
-        currentScore = self.getScore(gameState)
-        newScore = self.getScore(currentState)
-        currentFoods = self.getFood(gameState).asList()
-        newFoods = self.getFood(currentState).asList()
-        if currentScore < newScore:
+
+        if self.getScore(gameState) < self.getScore(currentState):
             return True
 
         actions = currentState.getLegalActions(self.index)
         actions.remove(Directions.STOP)
         currentDirection = currentState.getAgentState(self.index).configuration.direction
         reversedDirection = Directions.REVERSE[currentDirection]
+        currentFoodAmount = len(self.getFood(gameState).asList())
+        newFoodAmount = len(self.getFood(currentState).asList())
         if reversedDirection in actions:
-            if len(currentFoods) != len(newFoods):
+            if currentFoodAmount != newFoodAmount:
                 return True
             else:
                 actions.remove(reversedDirection)
@@ -450,7 +445,7 @@ class OffensiveReflexAgent(ReflexCaptureAgent):
                 for i in range(len(self.unmoveableList)):
                     total += self.unmoveableList[i]
                 if total > SHOULD_AVOID_UNMOVABLE:
-                    self.shouldComputeMonteCarlo = True
+                    self.basicBattleStrategy = True
                     return True
                 else:
                     return False
