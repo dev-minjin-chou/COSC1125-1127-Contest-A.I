@@ -122,7 +122,7 @@ class OffensiveReflexAgent(ReflexCaptureAgent):
         self.myPos = (-5, -5)
         self.counter = 0
         self.shouldAttack = False
-        self.prevFoodList = []
+        self.lastFoodList = []
         self.foodList = []
         self.shouldGoBack = 0
         self.homeTarget = None
@@ -195,10 +195,10 @@ class OffensiveReflexAgent(ReflexCaptureAgent):
 
         if len(distancesToGhosts) > 0:
             minDisToGhost = min(distancesToGhosts)
-            if minDisToGhost < GHOST_SAFE_DISTANCE:
-                features['distanceToGhost'] = minDisToGhost + features['successorScore']
-            else:
+            if minDisToGhost >= GHOST_SAFE_DISTANCE:
                 features['distanceToGhost'] = 0
+            else:
+                features['distanceToGhost'] = minDisToGhost + features['successorScore']
 
         return features
 
@@ -210,34 +210,29 @@ class OffensiveReflexAgent(ReflexCaptureAgent):
                         'successorScore': WEIGHT_SCORE,
                         'distanceToFood': WEIGHT_FOOD,
                         'distancesToGhost': WEIGHT_REGULAR_GHOST}
-            else:
-                return {'shouldOffense': WEIGHT_SHOULD_GO_BACK,
-                        'successorScore': WEIGHT_SCORE,
-                        'distanceToFood': WEIGHT_FOOD,
-                        'distancesToGhost': WEIGHT_REGULAR_GHOST}
+
+            return {'shouldOffense': WEIGHT_SHOULD_GO_BACK,
+                    'successorScore': WEIGHT_SCORE,
+                    'distanceToFood': WEIGHT_FOOD,
+                    'distancesToGhost': WEIGHT_REGULAR_GHOST}
 
         successor = self.getSuccessor(gameState, action)  # get the successor
         myPos = successor.getAgentState(self.index).getPosition()  # get the successor pos
         shortestDist = float("inf")
         scaredGhost = []
-        ghostScared = False
+        weightGhost = WEIGHT_REGULAR_GHOST
 
-        enemies = [gameState.getAgentState(i) for i in self.getOpponents(gameState)]
+        enemies = [successor.getAgentState(i) for i in self.getOpponents(successor)]
         for enemy in enemies:
             if enemy.isPacman and enemy.getPosition() is not None:
                 dist = self.getMazeDistance(myPos, enemy.getPosition())
-                if dist < shortestDist:
+                if shortestDist > dist:
                     shortestDist = dist
                     scaredGhost.append(enemy)
 
         if len(scaredGhost) > 0:
             if scaredGhost[-1].scaredTimer > 0:
-                ghostScared = True
-
-        if ghostScared:
-            weightGhost = WEIGHT_PANIC_GHOST
-        else:
-            weightGhost = WEIGHT_REGULAR_GHOST
+                weightGhost = WEIGHT_PANIC_GHOST
 
         return {'shouldOffense': WEIGHT_SHOULD_GO_BACK,
                 'successorScore': WEIGHT_SCORE,
@@ -247,21 +242,22 @@ class OffensiveReflexAgent(ReflexCaptureAgent):
     def preferrableAction(self, simulatedState):
         actions = simulatedState.getLegalActions(self.index)
         actions.remove(Directions.STOP)
-        if len(actions) == 1:
-            return actions[0]
-        else:
-            reversedDir = Directions.REVERSE[simulatedState.getAgentState(self.index).configuration.direction]
+        if len(actions) != 1:
+            direction = simulatedState.getAgentState(self.index).configuration.direction
+            reversedDir = Directions.REVERSE[direction]
             if reversedDir in actions:
                 actions.remove(reversedDir)
             return random.choice(actions)
+
+        return actions[0]
 
     def getActionNotBasicOp(self, gameState):
         self.foodList = self.getFood(gameState).asList()
         self.amountOfCapsules = len(self.getCapsules(gameState))
 
-        if len(self.prevFoodList) > len(self.foodList):
+        if len(self.lastFoodList) > len(self.foodList):
             self.shouldGoBack = 1
-        self.prevFoodList = self.foodList
+        self.lastFoodList = self.foodList
         self.lastAmountCapsules = self.amountOfCapsules
 
         if not gameState.getAgentState(self.index).isPacman:
@@ -284,7 +280,7 @@ class OffensiveReflexAgent(ReflexCaptureAgent):
             self.rapidConsumeQuota = 0
         if shortestDistance <= 5:
             self.shouldComputeMonteCarlo = False
-        if len(self.prevFoodList) > len(self.foodList):
+        if len(self.lastFoodList) > len(self.foodList):
             self.shouldComputeMonteCarlo = False
 
         return self.getActionFromMonteCarlo(gameState, shortestDistance)
@@ -306,7 +302,7 @@ class OffensiveReflexAgent(ReflexCaptureAgent):
 
             shortestDistance = float("inf")
 
-            if len(self.foodList) < len(self.prevFoodList):
+            if len(self.lastFoodList) > len(self.foodList):
                 self.rapidConsumeQuota += 1
 
             # If there's no food nearby or carrying foods >= MIN_COLLECTED_FOODS, go home (starting position)
