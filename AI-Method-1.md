@@ -1,4 +1,4 @@
-# Method 1: Expectimax and Heuristics
+# Expectimax and Heuristics
 
 Your notes about this part of the project, including acknowledgement, comments, strengths and limitations, etc. You do not need to explain the algorithm, tell us how you used it and how you applied it in your team.
 
