@@ -20,7 +20,7 @@ Your notes about this part of the project, including acknowledgement, comments, 
 
 #### *Advantages*  
 - Doesn't require as much manual tuning as other methods, as the policies are formed from experience
-- An advantage of approximate q-learning in particular, is that while q-learning learns the value of unique states through many iterations and experiences of being in that unique state, approximate q-learning can takes the elements of a state, compare it to a heuristic, and judge its value based on it's experience using that particular heuristic, rather than its experience being in that unique state
+- An advantage of approximate q-learning in particular, is that while q-learning learns the value of unique states through many iterations and experiences of being in that unique state, approximate q-learning can takes the elements of a state, compare it to a heuristic, and judge its value based on its experience using that particular heuristic, rather than its experience being in that unique state
 
 #### *Disadvantages*
 - Difficult to train well using regular q-learning in a long competition, as the layouts used aren't always the same, and teams are continually changing and improving their strategies which requires more learning
