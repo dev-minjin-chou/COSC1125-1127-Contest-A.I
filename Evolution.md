@@ -59,6 +59,7 @@ We were beaten by every staff team, except for one match with staff_team_top, al
 
 | Pros | Cons |
 |-----------------|:-------------|
-| No pros for this agent as | Unable to beat staff teams |
-| the code didn't work correctly   | Didn't eat many pellets |
-| | Didn't eat enemies that were on our side of the board intentionally |
+| No pros for this agent as 
+the code didn't work correctly | Unable to beat staff teams |
+|    | Didn't eat many pellets |
+| | Didn't intentionally eat enemies that were on our side of the board |
