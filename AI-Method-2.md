@@ -1,4 +1,4 @@
-# Method 2: Q-learning
+# Q-learning
 # Table of Contents
 - [Governing Strategy Tree](#governing-strategy-tree)
   * [Application](#application)
