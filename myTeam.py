@@ -172,28 +172,26 @@ class OffensiveReflexAgent(ReflexCaptureAgent):
         features = util.Counter()
         successor = self.getSuccessor(gameState, action)  # get the successor
         myPos = successor.getAgentState(self.index).getPosition()  # get the successor pos
-        foodList = self.getFood(successor).asList()  # get the foodlist
+        foodList = self.getFood(successor).asList()  # get the food as a list
         features['successorScore'] = self.getScore(successor)  # set score feature
 
-        # If current agent is a pacman
+        # If the current agent is a pacman
         if successor.getAgentState(self.index).isPacman:
             features['shouldOffense'] = TRUE
         else:
             features['shouldOffense'] = FALSE
 
         # Compute distance to the nearest food
-        if len(foodList) > 0:  # This should always be True,  but better safe than sorry
-            # myPos = successor.getAgentState(self.index).getPosition()
+        if len(foodList) > 0:
             minDistance = min([self.getMazeDistance(myPos, food) for food in foodList])
             features['distanceToFood'] = minDistance
 
-        # Compute distance to the ghost so that we can consider if the ghost is chasing our pacman
+        # An array of ghost distances so that the agent can run away if there's a ghost nearby
         distancesToGhosts = []
-        # Get all opponent ghosts's positions
-        for oppoIndex in self.getOpponents(successor):
-            oppo = successor.getAgentState(oppoIndex)
-            if not oppo.isPacman and oppo.getPosition() is not None:
-                distancesToGhosts.append(self.getMazeDistance(myPos, oppo.getPosition()))
+        ghosts = [successor.getAgentState(oppo) for oppo in self.getOpponents(successor)]
+        for ghost in ghosts:
+            if not ghost.isPacman and ghost.getPosition() is not None:
+                distancesToGhosts.append(self.getMazeDistance(myPos, ghost.getPosition()))
 
         if len(distancesToGhosts) > 0:
             minDisToGhost = min(distancesToGhosts)
@@ -220,8 +218,6 @@ class OffensiveReflexAgent(ReflexCaptureAgent):
 
         successor = self.getSuccessor(gameState, action)  # get the successor
         myPos = successor.getAgentState(self.index).getPosition()  # get the successor pos
-
-        # Compute distance to the ghost so that we can consider if the ghost is chasing our pacman
         minDistance = float("inf")
         scaredGhost = []
         ghostScared = False
@@ -309,7 +305,7 @@ class OffensiveReflexAgent(ReflexCaptureAgent):
             if not gameState.getAgentState(self.index).isPacman:
                 self.rapidConsumeQuota = 0
 
-            modeMinDistance = float("inf")
+            shortestDistance = float("inf")
 
             if len(self.foodList) < len(self.prevFoodList):
                 self.rapidConsumeQuota += 1
@@ -320,8 +316,8 @@ class OffensiveReflexAgent(ReflexCaptureAgent):
             else:
                 for food in self.foodList:
                     distance = self.getMazeDistance(self.myPos, food)
-                    if distance < modeMinDistance:
-                        modeMinDistance = distance
+                    if distance < shortestDistance:
+                        shortestDistance = distance
                         self.modeTarget = food
 
             actions = gameState.getLegalActions(self.index)
