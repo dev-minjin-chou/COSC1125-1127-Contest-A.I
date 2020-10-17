@@ -5,7 +5,7 @@ We then switched our offensive agent to have both attack and defensive capabilit
 
 We changed our approach and had two offensive agents that are capable of attacking and defending at the same time, but at the ‘top’ and ‘bottom’ part of the grid for the preliminary contest, this however didn’t work correctly as our agents would tend to get stuck in a loop and would chase enemies on our end of the grid but never actually eat them, always keeping 1 cell between them.
 
-The approach we are currently using and finding great results with utilities Monte Carlo Tree Search.
+The approach we are currently using and finding great results with utilises Monte Carlo Tree Search.
 ## General Comments
 
 _General comments about the project goes here_
