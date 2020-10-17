@@ -524,20 +524,20 @@ class DefensiveReflexAgent(ReflexCaptureAgent):
             if enemy.isPacman and enemy.getPosition() is not None:
                 invaders.append(enemy.getPosition())
 
-        if len(invaders) > 0:
-            for enemy in invaders:
-                distance = self.getMazeDistance(enemy, agentPosition)
-                if distance < minDistance:
-                    minDistance = distance
-                    closestEnemies.append(enemy)
-            self.goal = closestEnemies[-1]
-        else:
+        if len(invaders) <= 0:
             # If number of current foods are less than last checked foods, it means
             # some foods had been consumed by the enemy and the defensive agent couldn't protect it.
             # So, set the goal to previously consumed food.
             if len(foods) < len(self.lastCheckedFoods):
                 consumedFood = set(self.lastCheckedFoods) - set(foods)
                 self.goal = consumedFood.pop()
+        else:
+            for enemy in invaders:
+                distance = self.getMazeDistance(enemy, agentPosition)
+                if distance < minDistance:
+                    minDistance = distance
+                    closestEnemies.append(enemy)
+            self.goal = closestEnemies[-1]
 
         self.lastCheckedFoods = foods
 
