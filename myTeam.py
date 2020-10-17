@@ -104,7 +104,7 @@ class OffensiveReflexAgent(ReflexCaptureAgent):
 
         self.currentFoodSize = 10000000
         self.lastPostions = {}
-        self.myPos = (-5, -5)
+        self.myPos = (0, 0)
         self.counter = 0
         self.shouldAttack = False
         self.lastFoodList = []
