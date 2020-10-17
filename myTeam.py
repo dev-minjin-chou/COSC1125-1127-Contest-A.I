@@ -20,12 +20,12 @@ def createTeam(firstIndex, secondIndex, isRed,
 
 # Define global constants for representing the weights of features
 # Feature weights
-WEIGHT_SCORE = 200
 WEIGHT_FOOD = -5
-WEIGHT_PANIC_GHOST = 0
-WEIGHT_REGULAR_GHOST = 210
-WEIGHT_SHOULD_ATTACK = 3000
+WEIGHT_SCORE = 200
 WEIGHT_SHOULD_GO_BACK = 0
+WEIGHT_SHOULD_ATTACK = 3000
+WEIGHT_REGULAR_GHOST = 210
+WEIGHT_PANIC_GHOST = 0
 # Flags for offensive agent
 ENFORCE_OFFENSE = 20
 GHOST_SAFE_DISTANCE = 5
@@ -324,12 +324,11 @@ class OffensiveReflexAgent(ReflexCaptureAgent):
         return bestAction
 
     def monteCarlo(self, gameState, rounds):
-        simulatedState = gameState.deepCopy()
-        while rounds > 0:
-            simulatedAction = self.preferrableAction(simulatedState)
-            simulatedState = simulatedState.generateSuccessor(self.index, simulatedAction)
-            rounds = rounds - 1
-        return self.evaluate(simulatedState, Directions.STOP)
+        state = gameState.deepCopy()
+        for i in range(rounds):
+            simulatedAction = self.preferrableAction(state)
+            state = state.generateSuccessor(self.index, simulatedAction)
+        return self.evaluate(state, Directions.STOP)
 
     def refineActions(self, gameState, action, rounds):
         if rounds == 0:
@@ -337,7 +336,7 @@ class OffensiveReflexAgent(ReflexCaptureAgent):
 
         currentState = gameState.generateSuccessor(self.index, action)
 
-        if self.getScore(gameState) < self.getScore(currentState):
+        if self.getScore(currentState) > self.getScore(gameState):
             return True
 
         actions = currentState.getLegalActions(self.index)
@@ -352,12 +351,10 @@ class OffensiveReflexAgent(ReflexCaptureAgent):
             else:
                 actions.remove(reversedDirection)
 
-        if len(actions) == 0:
-            return False
-
-        for action in actions:
-            if self.refineActions(currentState, action, rounds - 1):
-                return True
+        if len(actions) != 0:
+            for action in actions:
+                if self.refineActions(currentState, action, rounds - 1):
+                    return True
         return False
 
     def refineDangerousActions(self, gameState, action, rounds):
@@ -392,9 +389,11 @@ class OffensiveReflexAgent(ReflexCaptureAgent):
             centerX = int(mapLayout['centerX'])
             if not gameState.hasWall(centerX, i):
                 self.firstGoal.append((centerX, i))
+
         while len(self.firstGoal) > 2:
             del self.firstGoal[0]
             self.firstGoal = self.firstGoal[:-1]
+
         if len(self.firstGoal) == 2:
             self.firstGoal.remove(self.firstGoal[0])
 
