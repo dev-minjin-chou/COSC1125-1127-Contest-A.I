@@ -27,8 +27,6 @@ WEIGHT_REGULAR_GHOST = 210
 WEIGHT_SHOULD_ATTACK = 3000
 WEIGHT_SHOULD_GO_BACK = 0
 # Flags for offensive agent
-TRUE = 1
-FALSE = 0
 ENFORCE_OFFENSE = 20
 GHOST_SAFE_DISTANCE = 5
 SHOULD_AVOID_UNMOVABLE = 1
@@ -158,15 +156,16 @@ class OffensiveReflexAgent(ReflexCaptureAgent):
     def getFeatures(self, gameState, action):
         features = util.Counter()
         successor = self.getSuccessor(gameState, action)  # get the successor
-        myPos = successor.getAgentState(self.index).getPosition()  # get the successor pos
+        myState = successor.getAgentState(self.index)
+        myPos = myState.getPosition()  # get the successor pos
         foodList = self.getFood(successor).asList()  # get the food as a list
         features['successorScore'] = self.getScore(successor)  # set score feature
 
         # If the current agent is a pacman
         if successor.getAgentState(self.index).isPacman:
-            features['shouldOffense'] = TRUE
+            features['shouldOffense'] = 1
         else:
-            features['shouldOffense'] = FALSE
+            features['shouldOffense'] = 0
 
         # Compute distance to the nearest food
         if len(foodList) > 0:
