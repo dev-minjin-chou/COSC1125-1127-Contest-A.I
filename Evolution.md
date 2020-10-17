@@ -29,8 +29,9 @@ We only managed to beat staff_team_basic once, and every other staff team match 
 
 | Pros | Cons |
 |-----------------|:-------------|
-| First body part | Second cell  |
-| Second line     | foo          |
+| Good start, was able to beat some teams | Not smart in choosing targets to chase between both agents |
+| | Was easily confused, getting stuck in loops |
+| | Didn't make very good use of power pellets |
 ----
 ## Second Agent Team - Heuristic Offensive Agents
 ----
@@ -58,5 +59,6 @@ We were beaten by every staff team, except for one match with staff_team_top, al
 
 | Pros | Cons |
 |-----------------|:-------------|
-| First body part | Second cell  |
-| Second line     | foo          |
+| No pros for this agent as | Unable to beat staff teams |
+| the code didn't work correctly   | Didn't eat many pellets |
+| | Didn't eat enemies that were on our side of the board intentionally |
