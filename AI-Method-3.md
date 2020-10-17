@@ -1,4 +1,4 @@
-# Method 3: Monte Carlo Tree Search (MCTS)
+# Monte Carlo Tree Search (MCTS)
 # Table of Contents
 - [Governing Strategy Tree](#governing-strategy-tree)
   * [Motivation](#motivation)
