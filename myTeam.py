@@ -174,18 +174,18 @@ class OffensiveReflexAgent(ReflexCaptureAgent):
             features['distanceToFood'] = minDistance
 
         # An array of ghost distances so that the agent can run away if there's a ghost nearby
-        distancesToGhosts = []
+        minDisToGhost = 9999
         ghosts = [successor.getAgentState(oppo) for oppo in self.getOpponents(successor)]
         for ghost in ghosts:
             if not ghost.isPacman and ghost.getPosition() is not None:
-                distancesToGhosts.append(self.getMazeDistance(myPos, ghost.getPosition()))
+                dist = self.getMazeDistance(myPos, ghost.getPosition())
+                if minDisToGhost > dist:
+                    minDisToGhost = dist
 
-        if len(distancesToGhosts) > 0:
-            minDisToGhost = min(distancesToGhosts)
-            if minDisToGhost >= GHOST_SAFE_DISTANCE:
-                features['distanceToGhost'] = 0
-            else:
-                features['distanceToGhost'] = minDisToGhost + features['successorScore']
+        if minDisToGhost >= GHOST_SAFE_DISTANCE:
+            features['distanceToGhost'] = 0
+        else:
+            features['distanceToGhost'] = minDisToGhost + features['successorScore']
 
         return features
 
