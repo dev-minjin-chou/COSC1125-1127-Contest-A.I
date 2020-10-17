@@ -1,7 +1,6 @@
 # Monte Carlo Tree Search (MCTS)
 # Table of Contents
 - [Governing Strategy Tree](#governing-strategy-tree)
-  * [Motivation](#motivation)
   * [Application](#application)
   * [Trade-offs](#trade-offs)     
      - [Advantages](#advantages)
