@@ -119,18 +119,18 @@ class OffensiveReflexAgent(ReflexCaptureAgent):
         self.startingPosition = (0, 0)
 
         self.currentFoodSize = 10000000
-        self.prevPostions = {}
+        self.lastPostions = {}
         self.myPos = (-5, -5)
         self.counter = 0
         self.shouldAttack = False
-        self.lastTickFoodList = []
+        self.prevFoodList = []
         self.foodList = []
         self.shouldGoBack = 0
         self.homeTarget = None
         self.unmoveableList = []
-        self.switchTargetMode = False
+        self.shouldComputeMonteCarlo = False
         self.modeTarget = None
-        self.foodFastEaten = 0
+        self.rapidConsumeQuota = 0
         self.firstGoal = []
         self.basicOperation = False
         self.amountOfCapsules = 0
@@ -167,97 +167,7 @@ class OffensiveReflexAgent(ReflexCaptureAgent):
             return bestAction
 
         if not self.basicOperation:
-            self.foodList = self.getFood(gameState).asList()
-            self.amountOfCapsules = len(self.getCapsules(gameState))
-
-            realLastFoodLen = len(self.lastTickFoodList)
-
-            if len(self.foodList) < len(self.lastTickFoodList):
-                self.shouldGoBack = 1
-            self.lastTickFoodList = self.foodList
-            self.lastAmountCapsules = self.amountOfCapsules
-
-            if not gameState.getAgentState(self.index).isPacman:
-                self.shouldGoBack = 0
-
-            self.shouldAttack = self.compelledToAttack(gameState)
-
-            legalActions = gameState.getLegalActions(self.index)
-            legalActions.remove(Directions.STOP)
-
-            minDistance = float("inf")
-
-            opponentsIndices = self.getOpponents(gameState)
-            for opponentIndex in opponentsIndices:
-                oppo = gameState.getAgentState(opponentIndex)
-                if not oppo.isPacman and oppo.getPosition() is not None and not oppo.scaredTimer > 0:
-                    oppentPos = oppo.getPosition()
-                    dist = self.getMazeDistance(self.myPos, oppentPos)
-                    if dist < minDistance:
-                        minDistance = dist
-
-            actions = []
-            for a in legalActions:
-                if minDistance > 3 and self.refineActions(gameState, a, 6):
-                    actions.append(a)
-                elif self.refineDangerousActions(gameState, a, 9):
-                    actions.append(a)
-
-            self.shouldAvoidStuck(gameState)
-            if self.amountOfCapsules < self.lastAmountCapsules:
-                self.switchTargetMode = True
-                self.foodFastEaten = 0
-            if minDistance <= 5:
-                self.switchTargetMode = False
-            if len(self.foodList) < len(self.lastTickFoodList):
-                self.switchTargetMode = False
-
-            if self.switchTargetMode:
-                if not gameState.getAgentState(self.index).isPacman:
-                    self.foodFastEaten = 0
-
-                modeMinDistance = float("inf")
-
-                if len(self.foodList) < realLastFoodLen:
-                    self.foodFastEaten += 1
-
-                # If there's no food nearby or carrying foods >= MIN_COLLECTED_FOODS, go home (starting position)
-                if len(self.foodList) == 0 or self.foodFastEaten >= MIN_COLLECTED_FOODS:
-                    self.modeTarget = self.startingPosition
-                else:
-                    for food in self.foodList:
-                        distance = self.getMazeDistance(self.myPos, food)
-                        if distance < modeMinDistance:
-                            modeMinDistance = distance
-                            self.modeTarget = food
-
-                actions = gameState.getLegalActions(self.index)
-                actions.remove(Directions.STOP)
-                foodDistances = []
-
-                for a in actions:
-                    currentPos = gameState.generateSuccessor(self.index, a).getAgentPosition(self.index)
-                    foodDistances.append(self.getMazeDistance(currentPos, self.modeTarget))
-
-                best = min(foodDistances)
-                bestActions = [a for a, v in zip(actions, foodDistances) if v == best]
-                bestAction = random.choice(bestActions)
-                return bestAction
-
-            else:
-                self.foodFastEaten = 0
-                monteCarloValues = []
-                for a in actions:
-                    newState = gameState.generateSuccessor(self.index, a)
-                    value = 0
-                    for i in range(1, 24):
-                        value += self.monteCarlo(newState, 12)
-                    monteCarloValues.append(value)
-
-                maxMonteCarlo = max(monteCarloValues)
-                bestActions = [a for a, v in zip(actions, monteCarloValues) if v == maxMonteCarlo]
-                bestAction = random.choice(bestActions)
-            return bestAction
+            return self.getActionNotBasicOp(gameState)
 
     def getFeatures(self, gameState, action):
         # init
@@ -353,6 +263,98 @@ class OffensiveReflexAgent(ReflexCaptureAgent):
             if reversedDir in actions:
                 actions.remove(reversedDir)
             return random.choice(actions)
+
+    def getActionNotBasicOp(self, gameState):
+        self.foodList = self.getFood(gameState).asList()
+        self.amountOfCapsules = len(self.getCapsules(gameState))
+
+        if len(self.prevFoodList) > len(self.foodList):
+            self.shouldGoBack = 1
+        self.prevFoodList = self.foodList
+        self.lastAmountCapsules = self.amountOfCapsules
+
+        if not gameState.getAgentState(self.index).isPacman:
+            self.shouldGoBack = 0
+
+        self.shouldAttack = self.compelledToAttack(gameState)
+
+        shortestDistance = float("inf")
+        enemies = [gameState.getAgentState(oppo) for oppo in self.getOpponents(gameState)]
+        for enemy in enemies:
+            if not enemy.isPacman and enemy.getPosition() is not None and not enemy.scaredTimer > 0:
+                dist = self.getMazeDistance(self.myPos, enemy.getPosition())
+                if shortestDistance > dist:
+                    shortestDistance = dist
+
+        self.shouldAvoidStuck(gameState)
+
+        if self.lastAmountCapsules > self.amountOfCapsules:
+            self.shouldComputeMonteCarlo = True
+            self.rapidConsumeQuota = 0
+        if shortestDistance <= 5:
+            self.shouldComputeMonteCarlo = False
+        if  len(self.prevFoodList)> len(self.foodList):
+            self.shouldComputeMonteCarlo = False
+
+        return self.getActionFromMonteCarlo(gameState, shortestDistance)
+
+    def getActionFromMonteCarlo(self, gameState, shortestDistance):
+        legalActions = gameState.getLegalActions(self.index)
+        legalActions.remove(Directions.STOP)
+
+        actions = []
+        for act in legalActions:
+            if self.refineActions(gameState, act, 6) and shortestDistance > 3:
+                actions.append(act)
+            elif self.refineDangerousActions(gameState, act, 9):
+                actions.append(act)
+
+        if self.shouldComputeMonteCarlo:
+            if not gameState.getAgentState(self.index).isPacman:
+                self.rapidConsumeQuota = 0
+
+            modeMinDistance = float("inf")
+
+            if len(self.foodList) < len(self.prevFoodList):
+                self.rapidConsumeQuota += 1
+
+            # If there's no food nearby or carrying foods >= MIN_COLLECTED_FOODS, go home (starting position)
+            if len(self.foodList) == 0 or self.rapidConsumeQuota >= MIN_COLLECTED_FOODS:
+                self.modeTarget = self.startingPosition
+            else:
+                for food in self.foodList:
+                    distance = self.getMazeDistance(self.myPos, food)
+                    if distance < modeMinDistance:
+                        modeMinDistance = distance
+                        self.modeTarget = food
+
+            actions = gameState.getLegalActions(self.index)
+            actions.remove(Directions.STOP)
+            foodDistances = []
+
+            for a in actions:
+                currentPos = gameState.generateSuccessor(self.index, a).getAgentPosition(self.index)
+                foodDistances.append(self.getMazeDistance(currentPos, self.modeTarget))
+
+            best = min(foodDistances)
+            bestActions = [a for a, v in zip(actions, foodDistances) if v == best]
+            bestAction = random.choice(bestActions)
+            return bestAction
+
+        else:
+            self.rapidConsumeQuota = 0
+            monteCarloValues = []
+            for a in actions:
+                newState = gameState.generateSuccessor(self.index, a)
+                value = 0
+                for i in range(1, 24):
+                    value += self.monteCarlo(newState, 12)
+                monteCarloValues.append(value)
+
+            maxMonteCarlo = max(monteCarloValues)
+            bestActions = [a for a, v in zip(actions, monteCarloValues) if v == maxMonteCarlo]
+            bestAction = random.choice(bestActions)
+        return bestAction
 
     def monteCarlo(self, gameState, rounds):
         simulatedState = gameState.deepCopy()
@@ -457,19 +459,19 @@ class OffensiveReflexAgent(ReflexCaptureAgent):
         if len(self.unmoveableList) > 9:
             self.unmoveableList.pop(0)
 
-        if 2 in self.prevPostions and 2 in self.prevPostions:
-            if self.myPos == self.prevPostions[2] and self.myPos == self.prevPostions[4]:
-                if self.prevPostions[1] == self.prevPostions[3]:
+        if 2 in self.lastPostions and 4 in self.lastPostions:
+            if self.myPos == self.lastPostions[2] and self.myPos == self.lastPostions[4]:
+                if self.lastPostions[1] == self.lastPostions[3]:
                     self.unmoveableList.append(1)
                 else:
                     self.unmoveableList.append(1)
             else:
                 self.unmoveableList.append(0)
 
-            self.prevPostions[4] = self.prevPostions[3]
-            self.prevPostions[3] = self.prevPostions[2]
-            self.prevPostions[2] = self.prevPostions[1]
-            self.prevPostions[1] = self.prevPostions[0]
+            self.lastPostions[4] = self.lastPostions[3]
+            self.lastPostions[3] = self.lastPostions[2]
+            self.lastPostions[2] = self.lastPostions[1]
+            self.lastPostions[1] = self.lastPostions[0]
 
             if len(self.unmoveableList) < 9:
                 return False
@@ -477,7 +479,7 @@ class OffensiveReflexAgent(ReflexCaptureAgent):
                 for i in range(len(self.unmoveableList)):
                     total += self.unmoveableList[i]
                 if total > SHOULD_AVOID_STUCK:
-                    self.switchTargetMode = True
+                    self.shouldComputeMonteCarlo = True
                     return True
                 else:
                     return False
