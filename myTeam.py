@@ -32,21 +32,20 @@ def createTeam(firstIndex, secondIndex, isRed,
 ##########
 
 # Define global constants for representing the weights of features
+# Feature weights
+WEIGHT_SCORE = 200
+WEIGHT_FOOD = -5
+WEIGHT_PANIC_GHOST = 0
+WEIGHT_REGULAR_GHOST = 210
+WEIGHT_SHOULD_ATTACK = 3000
+WEIGHT_SHOULD_GO_BACK = 0
 # Flags for offensive agent
 TRUE = 1
 FALSE = 0
 ENFORCE_OFFENSE = 20
 GHOST_SAFE_DISTANCE = 5
-# Feature weights
-WEIGHT_SCORE = 200
-WEIGHT_FOOD = -5
-WEIGHT_SCARED_GHOST = 0
-WEIGHT_NORMAL_GHOST = 210
-WEIGHT_SHOULD_ATTACK = 3000
-WEIGHT_SHOULD_GO_BACK = 0
-SHOULD_AVOID_STUCK = 1
+SHOULD_AVOID_UNMOVABLE = 1
 MIN_COLLECTED_FOODS = 5
-
 # Flags for defensive agent
 REMAINING_FOODS = 4
 SHOULD_DEFEND_COUNTER = 4
@@ -170,20 +169,17 @@ class OffensiveReflexAgent(ReflexCaptureAgent):
             return self.getActionNotBasicOp(gameState)
 
     def getFeatures(self, gameState, action):
-        # init
         features = util.Counter()
-        # features = {}.fromkeys(['forcedOffensive','successorScore','distanceToFood','distanceToGhost'])
-
         successor = self.getSuccessor(gameState, action)  # get the successor
         myPos = successor.getAgentState(self.index).getPosition()  # get the successor pos
         foodList = self.getFood(successor).asList()  # get the foodlist
         features['successorScore'] = self.getScore(successor)  # set score feature
 
-        # if the agent at the successor's pos becomes an pacman,
+        # If current agent is a pacman
         if successor.getAgentState(self.index).isPacman:
-            features['forcedOffensive'] = TRUE
+            features['shouldOffense'] = TRUE
         else:
-            features['forcedOffensive'] = FALSE
+            features['shouldOffense'] = FALSE
 
         # Compute distance to the nearest food
         if len(foodList) > 0:  # This should always be True,  but better safe than sorry
@@ -212,21 +208,21 @@ class OffensiveReflexAgent(ReflexCaptureAgent):
 
         if self.shouldAttack:
             if self.shouldGoBack == 0:
-                return {'forcedOffensive': WEIGHT_SHOULD_ATTACK,
+                return {'shouldOffense': WEIGHT_SHOULD_ATTACK,
                         'successorScore': WEIGHT_SCORE,
                         'distanceToFood': WEIGHT_FOOD,
-                        'distancesToGhost': WEIGHT_NORMAL_GHOST}
+                        'distancesToGhost': WEIGHT_REGULAR_GHOST}
             else:
-                return {'forcedOffensive': WEIGHT_SHOULD_GO_BACK,
+                return {'shouldOffense': WEIGHT_SHOULD_GO_BACK,
                         'successorScore': WEIGHT_SCORE,
                         'distanceToFood': WEIGHT_FOOD,
-                        'distancesToGhost': WEIGHT_NORMAL_GHOST}
+                        'distancesToGhost': WEIGHT_REGULAR_GHOST}
 
         successor = self.getSuccessor(gameState, action)  # get the successor
         myPos = successor.getAgentState(self.index).getPosition()  # get the successor pos
 
         # Compute distance to the ghost so that we can consider if the ghost is chasing our pacman
-        minDistance = 10000000
+        minDistance = float("inf")
         scaredGhost = []
         ghostScared = False
         # Get all opponent ghosts's positions
@@ -244,11 +240,11 @@ class OffensiveReflexAgent(ReflexCaptureAgent):
                 ghostScared = True
 
         if ghostScared:
-            weightGhost = WEIGHT_SCARED_GHOST
+            weightGhost = WEIGHT_PANIC_GHOST
         else:
-            weightGhost = WEIGHT_NORMAL_GHOST
+            weightGhost = WEIGHT_REGULAR_GHOST
 
-        return {'forcedOffensive': WEIGHT_SHOULD_GO_BACK,
+        return {'shouldOffense': WEIGHT_SHOULD_GO_BACK,
                 'successorScore': WEIGHT_SCORE,
                 'distanceToFood': WEIGHT_FOOD,
                 'distancesToGhost': weightGhost}
@@ -478,7 +474,7 @@ class OffensiveReflexAgent(ReflexCaptureAgent):
             else:
                 for i in range(len(self.unmoveableList)):
                     total += self.unmoveableList[i]
-                if total > SHOULD_AVOID_STUCK:
+                if total > SHOULD_AVOID_UNMOVABLE:
                     self.shouldComputeMonteCarlo = True
                     return True
                 else:
