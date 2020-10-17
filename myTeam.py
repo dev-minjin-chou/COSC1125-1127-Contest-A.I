@@ -190,18 +190,17 @@ class OffensiveReflexAgent(ReflexCaptureAgent):
         return features
 
     def getWeights(self, gameState, action):
+        weight = {'successorScore': WEIGHT_SCORE,
+                  'distanceToFood': WEIGHT_FOOD,
+                  'distancesToGhost': WEIGHT_REGULAR_GHOST}
 
         if self.shouldAttack:
-            if self.shouldGoBack == 0:
-                return {'shouldOffense': WEIGHT_SHOULD_ATTACK,
-                        'successorScore': WEIGHT_SCORE,
-                        'distanceToFood': WEIGHT_FOOD,
-                        'distancesToGhost': WEIGHT_REGULAR_GHOST}
+            if self.shouldGoBack != 0:
+                weight['shouldOffense'] = WEIGHT_SHOULD_GO_BACK
+                return weight
 
-            return {'shouldOffense': WEIGHT_SHOULD_GO_BACK,
-                    'successorScore': WEIGHT_SCORE,
-                    'distanceToFood': WEIGHT_FOOD,
-                    'distancesToGhost': WEIGHT_REGULAR_GHOST}
+            weight['shouldOffense'] = WEIGHT_SHOULD_ATTACK
+            return weight
 
         successor = self.getSuccessor(gameState, action)  # get the successor
         myPos = successor.getAgentState(self.index).getPosition()  # get the successor pos
@@ -221,10 +220,9 @@ class OffensiveReflexAgent(ReflexCaptureAgent):
             if scaredGhost[-1].scaredTimer > 0:
                 weightGhost = WEIGHT_PANIC_GHOST
 
-        return {'shouldOffense': WEIGHT_SHOULD_GO_BACK,
-                'successorScore': WEIGHT_SCORE,
-                'distanceToFood': WEIGHT_FOOD,
-                'distancesToGhost': weightGhost}
+        weight['shouldOffense'] = WEIGHT_SHOULD_GO_BACK
+        weight['distancesToGhost'] = weightGhost
+        return weight
 
     def preferrableAction(self, simulatedState):
         actions = simulatedState.getLegalActions(self.index)
