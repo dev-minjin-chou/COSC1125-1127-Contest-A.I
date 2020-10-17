@@ -289,7 +289,7 @@ class OffensiveReflexAgent(ReflexCaptureAgent):
             self.rapidConsumeQuota = 0
         if shortestDistance <= 5:
             self.shouldComputeMonteCarlo = False
-        if  len(self.prevFoodList)> len(self.foodList):
+        if len(self.prevFoodList) > len(self.foodList):
             self.shouldComputeMonteCarlo = False
 
         return self.getActionFromMonteCarlo(gameState, shortestDistance)
@@ -480,16 +480,6 @@ class OffensiveReflexAgent(ReflexCaptureAgent):
                 else:
                     return False
 
-            if len(self.unmoveableList) < 9:
-                return False
-            else:
-                for i in range(len(self.unmoveableList)):
-                    total += self.unmoveableList[i]
-                if total > SHOULD_AVOID_STUCK:
-                    self.switchTargetMode = True
-                    return True
-                else:
-                    return False
 
 class DefensiveReflexAgent(ReflexCaptureAgent):
     def __init__(self, index):
