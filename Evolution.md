@@ -62,3 +62,64 @@ We were beaten by every staff team, except for one match with staff_team_top, al
 | No pros for this agent as the code didn't work correctly | Unable to beat staff teams |
 | | Didn't eat many pellets |
 | | Didn't intentionally eat enemies that were on our side of the board |
+----
+## Third Agent Team - Improved Expectimax Offensive and Defense Agents
+----
+#### Strategy summary
+
+### Demo
+
+*1. *
+
+![red agent bad](images/14-10_redagent_bad.gif)
+
+*2. *
+
+![orange agent good](images/14-10_orangeagent_good.gif)
+
+#### Competition: Daily Split (14/10)
+#### Results: Position - ??/?? | staff_team_basic defeated
+
+![Demo 1](images/14-10_split_leaderboard.JPG)
+
+![Demo 1](images/14-10_staff_chart.JPG)
+
+#### Results summary
+
+
+| Pros | Cons |
+|-----------------|:-------------|
+|  |  |
+----
+## Fourth Agent Team - Monte Carlo Tree Search Offense and Defense Agents
+----
+#### Strategy summary
+Monte Carlo!!!
+
+### Demo
+
+*1. *
+
+![border patrol](images/16-10_border_patrol.gif)
+
+*2. *
+
+![red mistake](images/16-10_redmistake.gif)
+
+*3. *
+
+![insane power pellet clutch](images/16-10_power.gif)
+
+#### Competition: Daily (16/10)
+#### Results: Position - ??/?? | staff_team_top beaten
+
+![Demo 1](images/16-10_leaderboard.JPG)
+
+![Demo 1](images/16-10_staff_chart.JPG)
+
+#### Results summary
+
+
+| Pros | Cons |
+|-----------------|:-------------|
+|  |  |
