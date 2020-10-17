@@ -365,19 +365,17 @@ class OffensiveReflexAgent(ReflexCaptureAgent):
             return True
 
         currentState = gameState.generateSuccessor(self.index, action)
-        currentScore = self.getScore(gameState)
-        newScore = self.getScore(currentState)
-        if currentScore < newScore:
+        if self.getScore(gameState) < self.getScore(currentState):
             return True
 
         actions = currentState.getLegalActions(self.index)
         actions.remove(Directions.STOP)
         currentDirection = currentState.getAgentState(self.index).configuration.direction
         reversedDirection = Directions.REVERSE[currentDirection]
-        if reversedDirection in actions:
-            actions.remove(reversedDirection)
-        else:
+        if reversedDirection not in actions:
             return True
+        else:
+            actions.remove(reversedDirection)
 
         if len(actions) == 0:
             return False
