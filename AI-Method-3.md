@@ -1,7 +1,4 @@
 # Method 3: Monte Carlo Tree Search (MCTS)
-
-Your notes about this part of the project, including acknowledgement, comments, strengths and limitations, etc. You do not need to explain the algorithm, tell us how you used it and how you applied it in your team.
-
 # Table of Contents
 - [Governing Strategy Tree](#governing-strategy-tree)
   * [Motivation](#motivation)
@@ -12,11 +9,6 @@ Your notes about this part of the project, including acknowledgement, comments, 
   * [Future improvements](#future-improvements)
 
 ## Governing Strategy Tree  
-
-### Motivation  
-
-
-[Back to top](#table-of-contents)
 
 ### Application  
 
