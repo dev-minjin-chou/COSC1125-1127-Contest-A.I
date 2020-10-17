@@ -218,18 +218,17 @@ class OffensiveReflexAgent(ReflexCaptureAgent):
 
         successor = self.getSuccessor(gameState, action)  # get the successor
         myPos = successor.getAgentState(self.index).getPosition()  # get the successor pos
-        minDistance = float("inf")
+        shortestDist = float("inf")
         scaredGhost = []
         ghostScared = False
-        # Get all opponent ghosts's positions
-        for oppoIndex in self.getOpponents(successor):
-            oppo = successor.getAgentState(oppoIndex)
 
-            if not oppo.isPacman and oppo.getPosition() is not None:
-                dist = self.getMazeDistance(myPos, oppo.getPosition())
-                if dist < minDistance:
-                    minDistance = dist
-                    scaredGhost.append(oppo)
+        enemies = [gameState.getAgentState(i) for i in self.getOpponents(gameState)]
+        for enemy in enemies:
+            if enemy.isPacman and enemy.getPosition() is not None:
+                dist = self.getMazeDistance(myPos, enemy.getPosition())
+                if dist < shortestDist:
+                    shortestDist = dist
+                    scaredGhost.append(enemy)
 
         if len(scaredGhost) > 0:
             if scaredGhost[-1].scaredTimer > 0:
@@ -500,6 +499,7 @@ class DefensiveReflexAgent(ReflexCaptureAgent):
 
         # Remove defending coordinate until only one coordinate left in the defendingArea
         while len(self.defendingArea) > 2:
+            # Remove first index
             del self.defendingArea[0]
             # Remove last index
             self.defendingArea = self.defendingArea[:-1]
@@ -542,8 +542,7 @@ class DefensiveReflexAgent(ReflexCaptureAgent):
         invaders = []
         for enemy in enemies:
             if enemy.isPacman and enemy.getPosition() is not None:
-                oppentPos = enemy.getPosition()
-                invaders.append(oppentPos)
+                invaders.append(enemy.getPosition())
 
         if len(invaders) > 0:
             for enemy in invaders:
