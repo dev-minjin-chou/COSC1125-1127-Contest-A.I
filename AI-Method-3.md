@@ -11,5 +11,5 @@ We are using Monte Carlo Technique as our final approach. This technique works r
 - Able to differentiate better actions to take in crucial times such as eating power capsules when ghost is nearby rather than picking up nearby foods.
 
 #### *Disadvantages*
-- Occasionally predicts the wrong movement/actions of opponents and takesthe wrong action, resulting in its death due to bad prediction.
+- Occasionally predicts the wrong movement/actions of opponents and takes the wrong action, resulting in its death due to bad prediction.
 - Occasionally gets confused at what actions its supposed to take hence moving back and forth in the process, wasting time and movements.
