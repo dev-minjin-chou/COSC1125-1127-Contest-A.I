@@ -155,11 +155,11 @@ class OffensiveReflexAgent(ReflexCaptureAgent):
 
     def getFeatures(self, gameState, action):
         features = util.Counter()
-        successor = self.getSuccessor(gameState, action)  # get the successor
+        successor = self.getSuccessor(gameState, action)  # Find successor
         myState = successor.getAgentState(self.index)
-        myPos = myState.getPosition()  # get the successor pos
+        myPos = myState.getPosition()  # Find successor's position
         foodList = self.getFood(successor).asList()  # get the food as a list
-        features['successorScore'] = self.getScore(successor)  # set score feature
+        features['successorScore'] = self.getScore(successor)
 
         # If the current agent is a pacman
         if successor.getAgentState(self.index).isPacman:
@@ -201,8 +201,8 @@ class OffensiveReflexAgent(ReflexCaptureAgent):
             weight['shouldOffense'] = WEIGHT_SHOULD_ATTACK
             return weight
 
-        successor = self.getSuccessor(gameState, action)  # get the successor
-        myPos = successor.getAgentState(self.index).getPosition()  # get the successor pos
+        successor = self.getSuccessor(gameState, action)  # Find successor
+        myPos = successor.getAgentState(self.index).getPosition()  # Find successor's position
         shortestDist = float("inf")
         scaredGhost = []
         weightGhost = WEIGHT_REGULAR_GHOST
