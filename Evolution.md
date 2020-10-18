@@ -164,7 +164,7 @@ The results we got were very impressive. We were only 4 spots from taking over s
 
 ![Demo 1](images/18-10_leaderboard.JPG)
 
-![Demo 1](images/18-10_staff_chart.JPG)
+![staff chart](images/18_10_staff_chart.JPG)
 
 #### Results summary
 
