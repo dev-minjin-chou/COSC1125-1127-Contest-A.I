@@ -3,8 +3,8 @@
 - [First Evolution: Expectimax Offense and Defense Agents](#first-agent-team---Expectimax-Offense-and-Defense-Agents)
 - [Second Evolution: Expectimax Offense Agents](#second-agent-team---Expectimax-Offense-Agents)
 - [Third Evolution: Improved Expectimax Offense and Defense Agents](#third-agent-team---Improved-Expectimax-Offense-and-Defense-Agents)
-- [Fourth Evolution: Monte Carlo Tree Search Offense and Defense Agents](#fourth-agent-team---Monte-Carlo-Tree-Search-Offense-and-Defense-Agents)
-- [Final Evolution: Improved Monte Carlo Tree Search Offense and Defense Agents](#final-agent-team---Improved-Monte-Carlo-Tree-Search-Offense-and-Defense-Agents)
+- [Fourth Evolution: Monte Carlo Technique Offense and Defense Agents](#fourth-agent-team---Monte-Carlo-Technique-Offense-and-Defense-Agents)
+- [Final Evolution: Improved Monte Carlo Techniques and Action Functions for Offense and Defense Agents](#final-agent-team---Improved-Monte-Carlo-Techniques-and-Action-Functions-for-Offense-and-Defense-Agents)
 
 ## First Agent Team - Expectimax Offense and Defense Agents
 ----
@@ -145,7 +145,7 @@ The results we got were very impressive. We were only 4 spots from taking over s
 [Back to top](#table-of-contents)
 
 ----
-## Final Agent Team - Improved Monte Carlo Techniques and action functions for Offense and Defense Agents
+## Final Agent Team - Improved Monte Carlo Techniques and Action Functions for Offense and Defense Agents
 ----
 #### Strategy summary
 
