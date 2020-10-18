@@ -1,4 +1,4 @@
-# Monte Carlo Tree Search (MCTS)
+# Monte Carlo Technique (MCT)
 
 ## Governing Strategy Tree  
 
