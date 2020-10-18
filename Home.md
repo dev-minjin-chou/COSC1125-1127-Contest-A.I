@@ -1,6 +1,6 @@
 # RMIT COSC1125/1127 AI Pacman Contest Project
 ## Introduction
-Pacman capture the flag contest is relatively different from the regular pacman games. Starting off with two teams competing with one another.
+Pacman capture the flag contest is relatively different from the regular pacman games. Starting off with two teams competing with one another, each teams have two agents that can either be offensive or defensive. Offense agents are responsible to enter opponent's territory and 'steal' food pellets. Each food pellets eaten would be turned to score when the offensive agent returns to its own side of the grid. Similarly opponent's pacman would do the same. This is where the role of defensive agent comes in. Defensive agent is responsible of 'protecting' its own side of the grid's food pellets and prevents opponent's pacman from entering and 'stealing' its foods. Rules are relatively basic, and the rules of classic pacman still stands such as a pacman is able to eat opponent's ghost if power capsules have been consumed. The team with the most score 'food pellets stolen' wins!
 
 ## List of pages
 1. [Home and Introduction]()
