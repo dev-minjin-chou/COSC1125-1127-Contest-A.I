@@ -1,13 +1,8 @@
 # Evolution of the approach
 # Table of Contents
-- [Governing Strategy Tree](#governing-strategy-tree)
-  * [Application](#application)
-  * [Trade-offs](#trade-offs)     
-     - [Advantages](#advantages)
-     - [Disadvantages](#disadvantages)
-  * [Future improvements](#future-improvements)
+- [First Evolution](#first-agent-team)
+- [First Evolution](#first-agent-team)
 
-[Back to top](#table-of-contents)
 ## First Agent Team - Expectimax Offensive and Defensive Agents
 ----
 #### Strategy summary
@@ -40,6 +35,9 @@ We only managed to beat staff_team_basic once, and every other staff team match 
 | Good start, was able to beat some teams | Not smart in choosing targets to chase between both agents |
 | | Was easily confused, getting stuck in loops |
 | | Didn't make very good use of power pellets |
+
+[Back to top](#table-of-contents)
+
 ----
 ## Second Agent Team - Expectimax Offensive Agents
 ----
@@ -70,6 +68,9 @@ We were beaten by every staff team, except for one match with staff_team_top, al
 | No pros for this agent as the code didn't work correctly | Unable to beat staff teams |
 | | Didn't eat many pellets |
 | | Didn't intentionally eat enemies that were on our side of the board |
+
+[Back to top](#table-of-contents)
+
 ----
 ## Third Agent Team - Improved Expectimax Offensive and Defense Agents
 ----
@@ -100,6 +101,9 @@ The team worked a bit better than earlier submissions, especially the defense ag
 |-----------------|:-------------|
 | Defense agent worked very effectively | Offense agent made bad choices |
 | The team managed to actually eat food and enemies |  |
+
+[Back to top](#table-of-contents)
+
 ----
 ## Fourth Agent Team - Monte Carlo Tree Search Offense and Defense Agents
 ----
@@ -134,3 +138,5 @@ The results we got were very impressive. We were only 4 spots from taking over s
 |-----------------|:-------------|
 | A great improvement from all other iterations | Still some minor decision making problems |
 | Finally uses power pellets to their advantage |  |
+
+[Back to top](#table-of-contents)
