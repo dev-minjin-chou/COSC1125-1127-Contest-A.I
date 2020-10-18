@@ -5,6 +5,7 @@
 ### Application  
 
 ### Trade-offs  
+Our agent is relatively smarter when we are using qlearning agents compared to expectimax agents however the trade-offs is qlearning agents are harder to implement and train. Switching out the evaluation function by using computeQValueActions shows a relatively different behaviour when we were using expectimax. Our pacman is more sensitive in detecting opponents however due to we are using approximateQLearning at times it is hard to train our agent as each maps ran are random. It would be more efficient if we were to switch to deepQLearning however due to time constraints we are unable to get it to work. 
 
 #### *Advantages*  
 - Doesn't require as much manual tuning as other methods, as the policies are formed from experience
