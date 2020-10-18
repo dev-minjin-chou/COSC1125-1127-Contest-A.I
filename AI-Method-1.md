@@ -2,7 +2,7 @@
 ## Governing Strategy Tree  
 
 ### Application  
-Uses expectimax agents for offensive. Calculates each states utility values based on expectations and returns the max value of it, not particularly smart. Implemented together with an evaluation function to further refine the characteristics of pacman. 
+The technique that was initially used for our first set of agent teams, which used expectimax for offensive agents. Calculates each states utility values based on expectations and returns the max value of it, not particularly smart. Implemented together with an evaluation function to further refine the characteristics of pacman.
 
 ### Trade-offs  
 
