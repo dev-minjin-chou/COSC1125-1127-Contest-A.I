@@ -1,5 +1,5 @@
 # Evolution of the approach
-
+[Back to top](#table-of-contents)
 ## First Agent Team - Expectimax Offensive and Defensive Agents
 ----
 #### Strategy summary
