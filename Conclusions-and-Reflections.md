@@ -1,5 +1,3 @@
-## Challenges  
-
 ## Future Improvements
 
 An improvement for both agents would be if they could be fluid in their strategies. It's something that staff_team_super is excellent at, and one of the many reasons they've been so dominant in the leaderboards. Being able to analyse a situation and make a decision as to whether the agent should be defending their side of the board, or moving to the opponent's side to grab food is essential to overcoming some of the competition that was ranked highly towards the end of the semester. Fluidity would be more effective than statically deciding whether there should be one defense agent and one offense agent, or even just two offense agents. Also, if both agents can swap between an offensive and defensive strategy, then when an opponent eats a power pellet, both agents could simply make their way to the opponent's side to grab food, mostly negating the benefits the opponents gain from eating a power pellet.
