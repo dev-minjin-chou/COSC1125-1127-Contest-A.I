@@ -63,7 +63,7 @@ We learnt through some testing and observing other teams that having multiple of
 ![Demo 1](images/prelim_leaderboard.png)
 
 #### Results summary
-We were beaten by every staff team, except for one match with staff_team_top, although that was most likely random luck. As the agents would rarely ever eat any opponents, but would still chase them around the board, we would lose a large majority of matches as long as the opponents managed to get at least 1 pellet.
+We were beaten by every staff team, except for one match with staff_team_top, although that was most likely random luck. As the agents would rarely ever eat any opponents due to imbalanced weights and features values, but would still chase them around the board, we would lose a large majority of matches as long as the opponents managed to get at least 1 pellet.
 
 
 | Pros | Cons |
@@ -108,10 +108,10 @@ The team worked a bit better than earlier submissions, especially the defense ag
 [Back to top](#table-of-contents)
 
 ----
-## Fourth Agent Team - Monte Carlo Tree Search Offense and Defense Agents
+## Fourth Agent Team - Monte Carlo Technique Offense and Defense Agents
 ----
 #### Strategy summary
-We weren't getting desirable results just using expectimax agents, so after spending some time working on an agent team that uses MCTS, we tested it out in a daily competition.
+We weren't getting desirable results just using expectimax agents, so after spending some time working on an agent team that uses MCT, we tested it out in a daily competition.
 
 ### Demo
 
@@ -135,7 +135,7 @@ We weren't getting desirable results just using expectimax agents, so after spen
 ![Demo 1](images/16-10_staff_chart.JPG)
 
 #### Results summary
-The results we got were very impressive. We were only 4 spots from taking over staff_team_top, which was a big jump from the results we were getting from the expectimax agents.
+The results we got were very impressive. We were only 4 spots from taking over staff_team_top, which was a big jump from the results we were getting from the expectimax agents however refinements needs to be done due to pacman occasionally still exerts some 'dumb' behaviour.
 
 | Pros | Cons |
 |-----------------|:-------------|
@@ -145,7 +145,7 @@ The results we got were very impressive. We were only 4 spots from taking over s
 [Back to top](#table-of-contents)
 
 ----
-## Final Agent Team - Improved Monte Carlo Tree Search Offense and Defense Agents
+## Final Agent Team - Improved Monte Carlo Techniques and action functions for Offense and Defense Agents
 ----
 #### Strategy summary
 
