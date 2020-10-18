@@ -2,6 +2,7 @@
 ## Governing Strategy Tree  
 
 ### Application  
+Uses expectimax agents for offensive. Calculates each states utility values based on expectations and returns the max value of it, not particularly smart. Implemented together with an evaluation function to further refine the characteristics of pacman. 
 
 ### Trade-offs  
 The trade-offs in using this technique is our agent are unable to sense the opponent's agent if they are behind walls. However with a better features and weights function it works quite well in terms of agent's behaviour. 
