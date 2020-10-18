@@ -9,15 +9,15 @@ The first team composition we tried out were 2 heuristic agents that used expect
 
 *1. Both agents chasing after the same opponent*
 
-![(27/09) Chasing Enemy](images/27-09_chase_enemy.gif)
+![Chasing Enemy](images/27-09_chase_enemy.gif)
 
 *2. Both agents stuck in the same loop*
 
-![(27/09) Stuck in loop](images/27-09_loop.gif) 
+![Stuck in loop](images/27-09_loop.gif) 
 
 *3. Offense agent giving power pellets little value*
 
-![(27/09) Misusing Power Pellets](images/27-09_power.gif)
+![Misusing Power Pellets](images/27-09_power.gif)
 
 #### Competition: Daily (27/09 3:19am)
 #### Results: Position - 38/53 | No staff teams beaten
@@ -42,11 +42,11 @@ We learnt through some testing and observing other teams that having multiple of
 
 *1. Ghosts keeping their distance from Pacman*
 
-![(prelim) Ghosts keeping distance from pacman](images/prelim_ghost.gif)
+![Ghosts keeping distance from pacman](images/prelim_ghost.gif)
 
 *2. Ghosts trap Pacman, but are stuck and refuse to eat him*
 
-![(prelim) Ghosts trap pacman](images/prelim_stuck.gif)
+![Ghosts trap pacman](images/prelim_stuck.gif)
 
 #### Competition: Preliminary
 #### Results: Position - 59/69 | No staff teams beaten
@@ -66,60 +66,63 @@ We were beaten by every staff team, except for one match with staff_team_top, al
 ## Third Agent Team - Improved Expectimax Offensive and Defense Agents
 ----
 #### Strategy summary
+The weights of the features were altered to try and encourage eating food, and the defense agent was improved in general
 
 ### Demo
 
-*1. *
+*1. Offensive agent still makes some poor decisions*
 
 ![red agent bad](images/14-10_redagent_bad.gif)
 
-*2. *
+*2. Defensive agent is able to defend quite well*
 
 ![orange agent good](images/14-10_orangeagent_good.gif)
 
 #### Competition: Daily Split (14/10)
-#### Results: Position - ??/?? | staff_team_basic defeated
+#### Results: Position - 19/24 | staff_team_basic defeated
 
 ![Demo 1](images/14-10_split_leaderboard.JPG)
 
 ![Demo 1](images/14-10_staff_chart.JPG)
 
 #### Results summary
-
+The team worked a bit better than earlier submissions, especially the defense agent. However, the results show that we still weren't doing well enough to beat staff_team_medium.
 
 | Pros | Cons |
 |-----------------|:-------------|
-|  |  |
+| Defense agent worked very effectively | Offense agent made bad choices |
+| The team managed to actually eat food and enemies |  |
 ----
 ## Fourth Agent Team - Monte Carlo Tree Search Offense and Defense Agents
 ----
 #### Strategy summary
-Monte Carlo!!!
+We weren't getting desirable results just using expectimax agents, so after spending some time working on an agent team that uses MCTS, we tested it out in a daily competition.
 
 ### Demo
 
-*1. *
+*1. Defense agent patrols the border with might*
 
 ![border patrol](images/16-10_border_patrol.gif)
 
-*2. *
+*2. A mistake from the offensive agent costs us the game*
 
 ![red mistake](images/16-10_redmistake.gif)
 
-*3. *
+*3. Offensive agent uses power pellets to their maximum potential*
 
 ![insane power pellet clutch](images/16-10_power.gif)
 
 #### Competition: Daily (16/10)
-#### Results: Position - ??/?? | staff_team_top beaten
+#### Results: Position - 22/67 | staff_team_medium beaten
 
 ![Demo 1](images/16-10_leaderboard.JPG)
 
 ![Demo 1](images/16-10_staff_chart.JPG)
 
 #### Results summary
-
+The results we got were very impressive. We were only 4 spots from taking over staff_team_top, which was a big jump from the results we were getting from the expectimax agents.
 
 | Pros | Cons |
 |-----------------|:-------------|
-|  |  |
+| A great improvement from all other iterations | Still some minor decision making problems |
+| Finally uses power pellets to their advantage |  |
