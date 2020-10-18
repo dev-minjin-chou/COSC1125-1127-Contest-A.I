@@ -135,7 +135,7 @@ We weren't getting desirable results just using expectimax agents, so after spen
 ![Demo 1](images/16-10_staff_chart.JPG)
 
 #### Results summary
-The results we got were very impressive. We were only 4 spots from taking over staff_team_top, which was a big jump from the results we were getting from the expectimax agents however refinements needs to be done due to pacman occasionally still exerts some 'dumb' behaviour.
+The results we got were very impressive. We were only 4 spots from taking over staff_team_top, which was a big jump from the results we were getting from the expectimax agents however refinements needs to be done due to pacman occasionally still exerting some 'dumb' behaviour.
 
 | Pros | Cons |
 |-----------------|:-------------|
@@ -148,7 +148,7 @@ The results we got were very impressive. We were only 4 spots from taking over s
 ## Final Agent Team - Improved Monte Carlo Techniques and Action Functions for Offense and Defense Agents
 ----
 #### Strategy summary
-
+The code has been refactored, and multiple action functions have been added, rather than just having one 'chooseAction' method to allow for multiple strategies to be used.
 ### Demo
 
 *1. Defense agent goes on a wild goose chase*
@@ -167,11 +167,11 @@ The results we got were very impressive. We were only 4 spots from taking over s
 ![staff chart](images/18_10_staff_chart.JPG)
 
 #### Results summary
-
+The first time we were able to beat staff_team_top on the leaderboards, however the agent crashes due to timing out in some games. This may become an issue in competitions that have a large number of games in total, especially if the agent crashes in a match that we were very likely going to win.
 
 | Pros | Cons |
 |-----------------|:-------------|
-|  | Still some minor decision making problems |
-|  |  |
+| Ultimately a good agent as a final result| Still some minor decision making problems |
+|  | Agent sometimes crashes from taking too long during a turn |
 
 [Back to top](#table-of-contents)
