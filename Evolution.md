@@ -4,6 +4,7 @@
 - [Second Evolution: Expectimax Offense Agents](#second-agent-team---Expectimax-Offense-Agents)
 - [Third Evolution: Improved Expectimax Offense and Defense Agents](#third-agent-team---Improved-Expectimax-Offense-and-Defense-Agents)
 - [Fourth Evolution: Monte Carlo Tree Search Offense and Defense Agents](#fourth-agent-team---Monte-Carlo-Tree-Search-Offense-and-Defense-Agents)
+- [Final Evolution: Improved Monte Carlo Tree Search Offense and Defense Agents](#final-agent-team---Improved-Monte-Carlo-Tree-Search-Offense-and-Defense-Agents)
 
 ## First Agent Team - Expectimax Offense and Defense Agents
 ----
@@ -147,7 +148,6 @@ The results we got were very impressive. We were only 4 spots from taking over s
 ## Final Agent Team - Improved Monte Carlo Tree Search Offense and Defense Agents
 ----
 #### Strategy summary
-We weren't getting desirable results just using expectimax agents, so after spending some time working on an agent team that uses MCTS, we tested it out in a daily competition.
 
 ### Demo
 
@@ -160,18 +160,18 @@ We weren't getting desirable results just using expectimax agents, so after spen
 ![red mistake](images/18-10_confused.gif)
 
 #### Competition: Daily (18/10)
-#### Results: Position - 22/67 | staff_team_top beaten
+#### Results: Position - 25/67 | staff_team_top beaten
 
 ![Demo 1](images/18-10_leaderboard.JPG)
 
 ![Demo 1](images/18-10_staff_chart.JPG)
 
 #### Results summary
-The results we got were very impressive. We were only 4 spots from taking over staff_team_top, which was a big jump from the results we were getting from the expectimax agents.
+
 
 | Pros | Cons |
 |-----------------|:-------------|
-| A great improvement from all other iterations | Still some minor decision making problems |
-| Finally uses power pellets to their advantage |  |
+|  | Still some minor decision making problems |
+|  |  |
 
 [Back to top](#table-of-contents)
