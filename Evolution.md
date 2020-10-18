@@ -78,7 +78,7 @@ We were beaten by every staff team, except for one match with staff_team_top, al
 ## Third Agent Team - Improved Expectimax Offense and Defense Agents
 ----
 #### Strategy summary
-The weights of the features were altered to try and encourage eating food, and the defense agent was improved in general
+The weights of the features were altered to try and encourage eating food, and the defense agent was improved in general.
 
 ### Demo
 
@@ -90,7 +90,7 @@ The weights of the features were altered to try and encourage eating food, and t
 
 ![Orange agent captures enemy](images/14-10_orangeagent_good.gif)
 
-#### Competition: Daily Split (14/10)
+#### Competition: Daily Split (14/10 2:12pm)
 #### Results: Position - 19/24 | staff_team_basic defeated
 
 ![Leaderboard](images/14-10_split_leaderboard.JPG)
@@ -127,7 +127,7 @@ We weren't getting desirable results just using expectimax agents, so after spen
 
 ![Red agent power pellet clutch](images/16-10_power.gif)
 
-#### Competition: Daily (16/10)
+#### Competition: Daily (16/10 2:13am)
 #### Results: Position - 22/67 | staff_team_medium beaten
 
 ![Leaderboard](images/16-10_leaderboard.JPG)
@@ -159,7 +159,7 @@ The code has been refactored, and multiple action functions have been added, rat
 
 ![Red agent stays put in one area](images/18-10_confused.gif)
 
-#### Competition: Daily (18/10)
+#### Competition: Daily (18/10 11:28am)
 #### Results: Position - 25/70 | staff_team_top beaten
 
 ![Leaderboard](images/18-10_leaderboard.JPG)
@@ -171,7 +171,7 @@ The first time we were able to beat staff_team_top on the leaderboards, however 
 
 | Pros | Cons |
 |-----------------|:-------------|
-| Ultimately a good agent as a final result| Still some minor decision making problems |
+| Highest ranking agent team we have submitted | Still some minor decision making problems |
 |  | Agent sometimes crashes from taking too long during a turn |
 
 [Back to top](#table-of-contents)
