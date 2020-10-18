@@ -1,7 +1,7 @@
 # Evolution of the approach
 # Table of Contents
-- [First Evolution](#first-agent-team)
-- [Second Evolution](#second-agent-team)
+- [First Evolution](#first-agent-team---expectimax-Offensive-and-Defensive-Agents)
+- [Second Evolution](#second-agent-team---Expectimax-Offensive-Agents)
 - [Third Evolution](#third-agent-team)
 - [Fourth Evolution](#fourth-agent-team)
 
