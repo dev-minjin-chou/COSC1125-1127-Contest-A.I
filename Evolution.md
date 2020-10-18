@@ -160,7 +160,7 @@ The results we got were very impressive. We were only 4 spots from taking over s
 ![red mistake](images/18-10_confused.gif)
 
 #### Competition: Daily (18/10)
-#### Results: Position - 25/67 | staff_team_top beaten
+#### Results: Position - 25/70 | staff_team_top beaten
 
 ![Demo 1](images/18-10_leaderboard.JPG)
 
