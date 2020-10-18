@@ -1,5 +1,7 @@
 # RMIT COSC1125/1127 AI Pacman Contest Project
+## Introduction
 
+## List of pages
 1. [Home and Introduction]()
 2. [Design Choices (Offense/Defense)](Design-Choices)
 
@@ -10,11 +12,6 @@
     2.3 [Monte Carlo Tree Search](AI-Method-3)
 3. [Evolution and Experiments](Evolution)
 4. [Conclusions and Reflections](Conclusions-and-Reflections)
-
-# Youtube presentation
-
-[![IMAGE ALT TEXT HERE](http://img.youtube.com/vi/bnMl0d-RcPQ/0.jpg)](https://www.youtube.com/watch?v=bnMl0d-RcPQ)
-
 
 ## Team Members
 
@@ -63,9 +60,3 @@ def wiki_rocks(text):
     formatter = lambda t: "funky"+t
     return formatter(text)
 ```
-
-
-You can check out the source of this page to see how that's done. Just clone the wiki and get inspired to start your own project wiki.
-
-
-Have fun!
