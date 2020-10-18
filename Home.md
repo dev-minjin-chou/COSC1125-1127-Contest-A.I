@@ -10,7 +10,7 @@ Pacman capture the flag contest is relatively different from the regular pacman 
 
     2.2 [Q-learning](AI-Method-2)
 
-    2.3 [Monte Carlo Tree Search](AI-Method-3)
+    2.3 [Monte Carlo Technique](AI-Method-3)
 3. [Evolution and Experiments](Evolution)
 4. [Conclusions and Reflections](Conclusions-and-Reflections)
 
