@@ -1,11 +1,11 @@
 # Evolution of the approach
 # Table of Contents
-- [First Evolution: Expectimax Offensive and Defensive Agents](#first-agent-team---Expectimax-Offensive-and-Defensive-Agents)
-- [Second Evolution: Expectimax Offensive Agents](#second-agent-team---Expectimax-Offensive-Agents)
-- [Third Evolution: Improved Expectimax Offensive and Defense Agents](#third-agent-team---Improved-Expectimax-Offensive-and-Defense-Agents)
+- [First Evolution: Expectimax Offense and Defense Agents](#first-agent-team---Expectimax-Offense-and-Defense-Agents)
+- [Second Evolution: Expectimax Offense Agents](#second-agent-team---Expectimax-Offense-Agents)
+- [Third Evolution: Improved Expectimax Offense and Defense Agents](#third-agent-team---Improved-Expectimax-Offense-and-Defense-Agents)
 - [Fourth Evolution: Monte Carlo Tree Search Offense and Defense Agents](#fourth-agent-team---Monte-Carlo-Tree-Search-Offense-and-Defense-Agents)
 
-## First Agent Team - Expectimax Offensive and Defensive Agents
+## First Agent Team - Expectimax Offense and Defense Agents
 ----
 #### Strategy summary
 The first team composition we tried out were 2 heuristic agents that used expectimax adversarial search. One agent was tasked with travelling to the opponent's end of the board and collecting food, the other was tasked with standing guard at the border of our end of the board, and chasing down enemy agents that made it past the border.
@@ -41,7 +41,7 @@ We only managed to beat staff_team_basic once, and every other staff team match 
 [Back to top](#table-of-contents)
 
 ----
-## Second Agent Team - Expectimax Offensive Agents
+## Second Agent Team - Expectimax Offense Agents
 ----
 #### Strategy summary
 We learnt through some testing and observing other teams that having multiple offensive agents was a good choice. We took our original offensive agent and tweaked it further so that it would patrol different regions of the board to cover the most distance.
@@ -74,7 +74,7 @@ We were beaten by every staff team, except for one match with staff_team_top, al
 [Back to top](#table-of-contents)
 
 ----
-## Third Agent Team - Improved Expectimax Offensive and Defense Agents
+## Third Agent Team - Improved Expectimax Offense and Defense Agents
 ----
 #### Strategy summary
 The weights of the features were altered to try and encourage eating food, and the defense agent was improved in general
