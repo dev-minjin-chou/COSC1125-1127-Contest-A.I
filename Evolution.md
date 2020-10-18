@@ -28,7 +28,7 @@ The first team composition we tried out were 2 heuristic agents that used expect
 #### Competition: Daily (27/09 3:19am)
 #### Results: Position - 38/53 | No staff teams beaten
 
-![(27-09) Leaderboard](images/27-09_leaderboard.png)
+![Leaderboard](images/27-09_leaderboard.png)
 
 #### Results summary
 We only managed to beat staff_team_basic once, and every other staff team match was lost. We were 2 places beneath staff_team_basic on the leaderboard, so ultimately there needed to be a lot more work done to make the agents perform better.
@@ -60,7 +60,7 @@ We learnt through some testing and observing other teams that having multiple of
 #### Competition: Preliminary
 #### Results: Position - 59/69 | No staff teams beaten
 
-![Demo 1](images/prelim_leaderboard.png)
+![Leaderboard(images/prelim_leaderboard.png)
 
 #### Results summary
 We were beaten by every staff team, except for one match with staff_team_top, although that was most likely random luck. As the agents would rarely ever eat any opponents due to imbalanced weights and features values, but would still chase them around the board, we would lose a large majority of matches as long as the opponents managed to get at least 1 pellet.
@@ -84,18 +84,18 @@ The weights of the features were altered to try and encourage eating food, and t
 
 *1. Offensive agent still makes some poor decisions*
 
-![red agent bad](images/14-10_redagent_bad.gif)
+![Red agent is captured](images/14-10_redagent_bad.gif)
 
 *2. Defensive agent is able to defend quite well*
 
-![orange agent good](images/14-10_orangeagent_good.gif)
+![Orange agent captures enemy](images/14-10_orangeagent_good.gif)
 
 #### Competition: Daily Split (14/10)
 #### Results: Position - 19/24 | staff_team_basic defeated
 
-![Demo 1](images/14-10_split_leaderboard.JPG)
+![Leaderboard](images/14-10_split_leaderboard.JPG)
 
-![Demo 1](images/14-10_staff_chart.JPG)
+![Staff chart](images/14-10_staff_chart.JPG)
 
 #### Results summary
 The team worked a bit better than earlier submissions, especially the defense agent. However, the results show that we still weren't doing well enough to beat staff_team_medium.
@@ -117,22 +117,22 @@ We weren't getting desirable results just using expectimax agents, so after spen
 
 *1. Defense agent patrols the border with might*
 
-![border patrol](images/16-10_border_patrol.gif)
+![Orange agent border patrol](images/16-10_border_patrol.gif)
 
 *2. A mistake from the offensive agent costs us the game*
 
-![red mistake](images/16-10_redmistake.gif)
+![Red agent costs us the game](images/16-10_redmistake.gif)
 
 *3. Offensive agent uses power pellets to their maximum potential*
 
-![insane power pellet clutch](images/16-10_power.gif)
+![Red agent power pellet clutch](images/16-10_power.gif)
 
 #### Competition: Daily (16/10)
 #### Results: Position - 22/67 | staff_team_medium beaten
 
-![Demo 1](images/16-10_leaderboard.JPG)
+![Leaderboard](images/16-10_leaderboard.JPG)
 
-![Demo 1](images/16-10_staff_chart.JPG)
+![Staff chart](images/16-10_staff_chart.JPG)
 
 #### Results summary
 The results we got were very impressive. We were only 4 spots from taking over staff_team_top, which was a big jump from the results we were getting from the expectimax agents however refinements needs to be done due to pacman occasionally still exerting some 'dumb' behaviour.
@@ -153,18 +153,18 @@ The code has been refactored, and multiple action functions have been added, rat
 
 *1. Defense agent goes on a wild goose chase*
 
-![orange mistake](images/18-10_chase.gif)
+![Orange agent chases ghosts unsuccessfully](images/18-10_chase.gif)
 
 *2. Offense agent is confused by all its options*
 
-![red mistake](images/18-10_confused.gif)
+![Red agent stays put in one area](images/18-10_confused.gif)
 
 #### Competition: Daily (18/10)
 #### Results: Position - 25/70 | staff_team_top beaten
 
-![Demo 1](images/18-10_leaderboard.JPG)
+![Leaderboard](images/18-10_leaderboard.JPG)
 
-![staff chart](images/18_10_staff_chart.JPG)
+![Staff chart](images/18_10_staff_chart.JPG)
 
 #### Results summary
 The first time we were able to beat staff_team_top on the leaderboards, however the agent crashes due to timing out in some games. This may become an issue in competitions that have a large number of games in total, especially if the agent crashes in a match that we were very likely going to win.
