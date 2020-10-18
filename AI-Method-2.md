@@ -3,7 +3,7 @@
 ## Governing Strategy Tree 
 
 ### Application  
-Attempted to use this technique as the base agent instead of reflexCaptureAgent. Took advantage of the computeQValuesAction to further evaluate a better legal action based on Q-values. Improved chooseAction function by implementing calculations of q-values. 
+Attempted to use this technique as the base agent instead of reflexCaptureAgent, but ultimately was never used in a competition. Took advantage of the computeQValuesAction to further evaluate a better legal action based on Q-values. Improved chooseAction function by implementing calculations of q-values. 
 
 ### Trade-offs 
 
