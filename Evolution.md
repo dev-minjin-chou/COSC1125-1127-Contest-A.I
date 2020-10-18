@@ -1,9 +1,9 @@
 # Evolution of the approach
 # Table of Contents
-- [First Evolution](#first-agent-team---Expectimax-Offensive-and-Defensive-Agents)
-- [Second Evolution](#second-agent-team---Expectimax-Offensive-Agents)
-- [Third Evolution](#third-agent-team---Improved-Expectimax-Offensive-and-Defense-Agents)
-- [Fourth Evolution](#fourth-agent-team---Monte-Carlo-Tree-Search-Offense-and-Defense-Agents)
+- [First Evolution: Expectimax Offensive and Defensive Agents](#first-agent-team---Expectimax-Offensive-and-Defensive-Agents)
+- [Second Evolution: Expectimax Offensive Agents](#second-agent-team---Expectimax-Offensive-Agents)
+- [Third Evolution: Improved Expectimax Offensive and Defense Agents](#third-agent-team---Improved-Expectimax-Offensive-and-Defense-Agents)
+- [Fourth Evolution: Monte Carlo Tree Search Offense and Defense Agents](#fourth-agent-team---Monte-Carlo-Tree-Search-Offense-and-Defense-Agents)
 
 ## First Agent Team - Expectimax Offensive and Defensive Agents
 ----
