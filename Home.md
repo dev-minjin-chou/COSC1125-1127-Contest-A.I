@@ -1,5 +1,6 @@
 # RMIT COSC1125/1127 AI Pacman Contest Project
 ## Introduction
+Pacman capture the flag contest is relatively different from the regular pacman games. Starting off with two teams competing with one another.
 
 ## List of pages
 1. [Home and Introduction]()
