@@ -8,6 +8,9 @@ We are using monte carlo technique as our final approach. This technique works r
 -Trade-offs of this technique is even though it is smart and is able to sense opponent quite far away unlike our first expectimax approach, this technique is not effective at times as occasionally it will 'predict' the wrong actions of the opponent and brought itself the inevitable end. 
 #### *Advantages*  
 -Allows us to further predict/'oversee' the actions of the opponents team, hence is able to avoid some of the most costly paths.
+-Able to sense opponent behind 'walls' and further distance away unlike the expectimax agents.
+-Able to differentiate better actions to take in crucial times such as eating power capsules when ghost is nearby rather than picking up nearby foods.
 
 #### *Disadvantages*
 -Occasionally predicts the wrong movement/actions of opponents and took the wrong action, causes itself to die in the process due to bad prediction.
+-Occasionally gets confused at what actions its supposed to take hence moving back and forth in the process, wasting time and movements.
