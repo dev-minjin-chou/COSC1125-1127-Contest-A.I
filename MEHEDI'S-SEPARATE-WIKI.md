@@ -1,4 +1,4 @@
-**Introduction
+**Introduction**
  Pacman capture the flag contest is a different types game of the regular pacman games. It have two agent which is offensive and defensive.Offense agents are responsible to enter opponent's base and eat dots.Numbers of dots eaten would be counted to score when the offensive agent returns to its own base safely. Similarly, opponent's pacman would do the same.On the other hand Defensive agent is responsible of 'protecting' its own base and obstruct opponent's pacman from entering and eating its dots.The team with the most score eaten dots wins!
 
 **Techniques:**
