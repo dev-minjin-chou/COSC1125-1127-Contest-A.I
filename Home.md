@@ -16,7 +16,7 @@ Pacman capture the flag contest is relatively different from the regular pacman 
 
 ## Youtube Presentation
 
-[!Youtube Video](https://www.youtube.com/watch?v=SC5Mu-1GHfc&feature=youtu.be)
+[![Youtube Video](http://img.youtube.com/vi/SC5Mu-1GHfc/0.jpg)](https://www.youtube.com/watch?v=SC5Mu-1GHfc&feature=youtu.be)
 
 ## Team Members
 
